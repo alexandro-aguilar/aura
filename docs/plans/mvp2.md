@@ -1,0 +1,17 @@
+# MVP2 plan — Home Assistant and local controls
+
+Status: implementation and local macOS acceptance complete. The user requested Home Assistant on this Mac and deferred Raspberry Pi validation until hardware is supplied. See the [full specification](../specs/mvp2.md), [verification evidence](../verification/mvp2.md) and [deployment guide](../deployment/home-assistant.md). Requirements: P-06, P-07 and S-01–08.
+
+| Task                                | Owner packages                              | Status and evidence                                                                                                                                                                       |
+| ----------------------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| M2-T01 Deployment and API decisions | docs, integrations, api                     | Complete: official REST/auth/tool APIs inspected; native fetch, request-time reads, separate HA Container, loopback/SSH access and explicit write grants selected                         |
+| M2-T02 Read-only device slice       | domain, integrations, api, web              | Complete: independent backend configuration, validated snapshots, unavailable/unknown states and server-only credentials; empty write grants retain read-only mode                        |
+| M2-T03 Authorized write slice       | application, integrations, contracts, agent | Complete: narrow on/off services, pending-first audit, one dispatch, bounded observed-state confirmation, uncertain outcome and per-light concurrency guard                               |
+| M2-T04 Direct local control slice   | application, contracts, api, web            | Complete: validated direct route and PWA controls reuse agent policy/audit; API tests prove provider-failure independence                                                                 |
+| M2-T05 Resilience and deployment    | integrations, api, persistence, docs        | Local acceptance complete: actual HA template-light HTTP/WS/direct operation, API restart, HA outage/recovery, v1 migration and ARM64 containers. Pi/physical acceptance deferred by user |
+
+The [historical read-only slice](../verification/mvp2-read-only.md) preceded these writes; it is not the current implementation limit. No new application dependencies were introduced. Mock devices remain the default and have their own repeatable container smoke checks.
+
+Exit evidence: authorized HA lights work through chat and direct controls, unavailable state is visible, audit/history survive restart, direct controls survive provider failure, and no generic HA service tool is registered. Local tests use real Home Assistant APIs and simulated template lights. A subsequent four-turn live OpenAI check passed against the local HA test lights; see verification evidence. Visual browser/offline/installability, Pi resource measurements and physical-light integration remain unverified.
+
+When hardware is supplied, follow the deployment guide: bring up the same simulated ARM64 stack, then select physical light grants, exercise on/off and reconnection/restart, and record actual Pi performance and durability. Keep loopback access through SSH until a separate household authentication/TLS design is approved. MQTT, voice, memory, automations and sensitive devices remain outside MVP2; do not start later phases implicitly.

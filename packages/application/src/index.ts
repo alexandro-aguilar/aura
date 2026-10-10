@@ -7,7 +7,12 @@ import type {
   OperationPolicy,
   Runtime,
 } from '@aura/domain';
-import { chatRequestSchema, lightOperationSchema } from '@aura/contracts';
+import { DeviceGatewayError } from '@aura/domain';
+import {
+  chatRequestSchema,
+  lightOperationSchema,
+  deviceControlRequestSchema,
+} from '@aura/contracts';
 import type { ChatEvent } from '@aura/contracts';
 
 export class ApplicationError extends Error {
@@ -19,8 +24,8 @@ export class ApplicationError extends Error {
   }
 }
 
-// Default deny. The composition root explicitly grants only simulated lights.
-export class MockLightPolicy implements OperationPolicy {
+// Default deny. Only the composition root supplies light grants.
+export class AllowedLightPolicy implements OperationPolicy {
   constructor(private readonly allowedIds: ReadonlySet<string>) {}
   authorize(operation: LightOperation): void {
     if (!this.allowedIds.has(operation.deviceId)) {
@@ -32,7 +37,22 @@ export class MockLightPolicy implements OperationPolicy {
   }
 }
 
+// Retain the MVP1 export for callers of the original mock policy.
+export { AllowedLightPolicy as MockLightPolicy };
+
+export class LightExecutionError extends Error {
+  constructor(
+    public readonly operationId: string,
+    public readonly cause: unknown,
+  ) {
+    super(
+      'Light execution did not complete. Inspect audit and device state before retrying.',
+    );
+  }
+}
+
 export class DeviceTools {
+  private readonly busyDevices = new Set<string>();
   constructor(
     private readonly devices: DeviceGateway,
     private readonly policy: OperationPolicy,
@@ -42,38 +62,123 @@ export class DeviceTools {
   list() {
     return this.devices.list();
   }
+
   async setLight(conversationId: string, untrusted: unknown) {
+    try {
+      return (await this.executeLight(conversationId, untrusted)).device;
+    } catch (error) {
+      if (error instanceof LightExecutionError) throw error.cause;
+      throw error;
+    }
+  }
+
+  async executeLight(conversationId: string, untrusted: unknown) {
     const operation = lightOperationSchema.parse(untrusted);
     const id = this.runtime.id();
+    let acquired = false;
     try {
-      this.policy.authorize(operation);
-    } catch (error) {
+      try {
+        this.policy.authorize(operation);
+      } catch (error) {
+        this.audit.record({
+          ...operation,
+          id,
+          conversationId,
+          status: 'denied',
+          createdAt: this.runtime.now(),
+        });
+        throw error;
+      }
       this.audit.record({
         ...operation,
         id,
         conversationId,
-        status: 'denied',
+        status: 'pending',
         createdAt: this.runtime.now(),
       });
-      throw error;
-    }
-    // An audit failure prevents execution. Failures after execution stay visible as pending.
-    this.audit.record({
-      ...operation,
-      id,
-      conversationId,
-      status: 'pending',
-      createdAt: this.runtime.now(),
-    });
-    let result;
-    try {
-      result = await this.devices.setLight(operation);
+      let device;
+      try {
+        if (this.busyDevices.has(operation.deviceId))
+          throw new ApplicationError(
+            'BUSY',
+            'This light already has an operation in progress.',
+          );
+        this.busyDevices.add(operation.deviceId);
+        acquired = true;
+        device = await this.devices.setLight(operation);
+      } catch (error) {
+        this.audit.finish(
+          id,
+          error instanceof DeviceGatewayError &&
+            error.code === 'OPERATION_UNCERTAIN'
+            ? 'uncertain'
+            : 'failed',
+        );
+        throw error;
+      }
+      // If this write fails, the existing pending record preserves uncertainty.
+      this.audit.finish(id, 'succeeded');
+      return { operationId: id, device };
     } catch (error) {
-      this.audit.finish(id, 'failed');
-      throw error;
+      throw new LightExecutionError(id, error);
+    } finally {
+      if (acquired) this.busyDevices.delete(operation.deviceId);
     }
-    this.audit.finish(id, 'succeeded');
-    return result;
+  }
+}
+
+export class DirectControlError extends ApplicationError {
+  constructor(
+    cause: unknown,
+    public readonly conversationId: string,
+    public readonly operationId?: string,
+  ) {
+    super(
+      cause instanceof ApplicationError || cause instanceof DeviceGatewayError
+        ? cause.code
+        : 'OPERATION_FAILED',
+      cause instanceof ApplicationError || cause instanceof DeviceGatewayError
+        ? cause.message
+        : 'The operation could not be completed. Inspect device state and audit before retrying.',
+    );
+    this.observedDevice =
+      cause instanceof DeviceGatewayError ? cause.observedDevice : undefined;
+  }
+  readonly observedDevice;
+}
+
+/** Provider-independent control; reuses the exact tool authorization/audit boundary. */
+export class DirectLightControl {
+  constructor(
+    private readonly conversations: ConversationRepository,
+    private readonly tools: DeviceTools,
+    private readonly runtime: Runtime,
+  ) {}
+  async execute(untrusted: unknown) {
+    const input = deviceControlRequestSchema.parse(untrusted);
+    const conversationId = input.conversationId ?? this.runtime.id();
+    if (input.conversationId && !this.conversations.exists(conversationId))
+      throw new ApplicationError('NOT_FOUND', 'Conversation not found.');
+    if (!input.conversationId)
+      this.conversations.create({
+        id: conversationId,
+        createdAt: this.runtime.now(),
+      });
+    try {
+      const result = await this.tools.executeLight(conversationId, {
+        deviceId: input.deviceId,
+        state: input.state,
+      });
+      return { ...result, conversationId };
+    } catch (error) {
+      if (error instanceof LightExecutionError)
+        throw new DirectControlError(
+          error.cause,
+          conversationId,
+          error.operationId,
+        );
+      throw new DirectControlError(error, conversationId);
+    }
   }
 }
 

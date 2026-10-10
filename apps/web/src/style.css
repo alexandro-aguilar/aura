@@ -90,3 +90,31 @@ button:disabled {
 .error {
   color: #9c2929;
 }
+.device-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.devices {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #ccd6cc;
+}
+.devices ul {
+  padding-left: 1.25rem;
+}
+.devices li {
+  margin: 0.75rem 0;
+}
+.devices small {
+  display: block;
+  color: #53695f;
+}
+.light-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+.light-controls button {
+  padding: 0.5rem 1rem;
+}

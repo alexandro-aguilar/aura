@@ -1,8 +1,27 @@
 export type LightState = 'on' | 'off';
+export type DeviceState = LightState | 'unavailable' | 'unknown';
 export interface Device {
   id: string;
   name: string;
-  state: LightState;
+  state: DeviceState;
+  observedAt?: string;
+  canControl?: boolean;
+}
+export class DeviceGatewayError extends Error {
+  constructor(
+    public readonly code:
+      | 'DEVICE_UNAVAILABLE'
+      | 'DEVICE_AUTH_FAILED'
+      | 'DEVICE_RESPONSE_INVALID'
+      | 'DEVICE_NOT_ALLOWED'
+      | 'DEVICE_NOT_READY'
+      | 'OPERATION_UNCERTAIN'
+      | 'READ_ONLY',
+    message: string,
+    public readonly observedDevice?: Device,
+  ) {
+    super(message);
+  }
 }
 export interface Message {
   id: string;
@@ -22,7 +41,7 @@ export interface LightOperation {
 export interface AuditEntry extends LightOperation {
   id: string;
   conversationId: string;
-  status: 'pending' | 'succeeded' | 'denied' | 'failed';
+  status: 'pending' | 'succeeded' | 'denied' | 'failed' | 'uncertain';
   createdAt: string;
 }
 export interface ConversationRepository {

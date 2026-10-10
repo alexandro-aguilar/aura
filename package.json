@@ -20,7 +20,15 @@
     "check": "yarn check:boundaries && yarn build && yarn typecheck && vitest run",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check:boundaries": "node scripts/check-boundaries.mjs"
+    "check:boundaries": "node scripts/check-boundaries.mjs",
+    "verify:compose": "node scripts/verify-compose.mjs",
+    "ha:up": "docker compose -f deploy/home-assistant/compose.yaml up -d --wait",
+    "ha:setup": "node scripts/setup-local-ha.mjs",
+    "ha:config:check": "docker compose -f deploy/home-assistant/compose.yaml exec -T homeassistant python -m homeassistant --script check_config --config /config",
+    "deploy:ha:local": "docker compose --env-file .env.home-assistant.local -f compose.yaml -f compose.home-assistant.yaml up --build -d --wait",
+    "verify:ha:local": "node --env-file=.env.home-assistant.local scripts/verify-local-ha.mjs",
+    "dev:api:ha:local": "HA_URL=http://127.0.0.1:8123 tsx watch --env-file=.env.home-assistant.local apps/api/src/main.ts",
+    "verify:openai:local": "node --env-file=.env.home-assistant.local scripts/verify-openai-local.mjs"
   },
   "devDependencies": {
     "@types/node": "24.10.15",

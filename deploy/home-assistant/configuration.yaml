@@ -1,0 +1,47 @@
+# Isolated local integration-test home. No physical integrations or hardware access.
+homeassistant:
+  name: Aura Local Test Home
+  time_zone: America/Merida
+  unit_system: metric
+  country: MX
+  latitude: 20.9674
+  longitude: -89.5926
+  elevation: 10
+frontend:
+api:
+http:
+config:
+onboarding:
+history:
+recorder:
+input_boolean:
+  aura_living_room:
+    name: Aura living room backing state
+  aura_bedroom:
+    name: Aura bedroom backing state
+template:
+  - light:
+      - name: Aura Living Room
+        unique_id: aura_local_living_room
+        default_entity_id: light.aura_living_room
+        state: "{{ is_state('input_boolean.aura_living_room', 'on') }}"
+        turn_on:
+          action: input_boolean.turn_on
+          target:
+            entity_id: input_boolean.aura_living_room
+        turn_off:
+          action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.aura_living_room
+      - name: Aura Bedroom
+        unique_id: aura_local_bedroom
+        default_entity_id: light.aura_bedroom
+        state: "{{ is_state('input_boolean.aura_bedroom', 'on') }}"
+        turn_on:
+          action: input_boolean.turn_on
+          target:
+            entity_id: input_boolean.aura_bedroom
+        turn_off:
+          action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.aura_bedroom

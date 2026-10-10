@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync, readFileSync } from 'node:fs';
+import Database from 'better-sqlite3';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
@@ -66,6 +67,82 @@ describe('SQLite repositories', () => {
       ).toThrow();
     } finally {
       storage.close();
+    }
+  });
+  it('upgrades an existing v1 database without losing history, audit IDs or order', () => {
+    const directory = mkdtempSync(join(tmpdir(), 'aura-migration-'));
+    const filename = join(directory, 'aura.sqlite');
+    const conversationId = randomUUID();
+    const auditId = randomUUID();
+    const initial = new Database(filename);
+    initial.exec(
+      readFileSync(
+        new URL('../migrations/0001_initial.sql', import.meta.url),
+        'utf8',
+      ),
+    );
+    initial.pragma('user_version = 1');
+    initial
+      .prepare('INSERT INTO conversations VALUES (?, ?)')
+      .run(conversationId, '2026-10-10T00:00:00Z');
+    initial
+      .prepare(
+        'INSERT INTO messages (id, conversation_id, role, content, created_at) VALUES (?, ?, ?, ?, ?)',
+      )
+      .run(
+        randomUUID(),
+        conversationId,
+        'user',
+        'Existing turn',
+        '2026-10-10T00:00:00Z',
+      );
+    initial
+      .prepare(
+        'INSERT INTO execution_audit (id, conversation_id, device_id, state, status, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+      )
+      .run(
+        auditId,
+        conversationId,
+        'light.living_room',
+        'on',
+        'pending',
+        '2026-10-10T00:00:00Z',
+      );
+    initial.close();
+    const storage = openPersistence(filename);
+    try {
+      expect(storage.conversations.messages(conversationId)[0]?.content).toBe(
+        'Existing turn',
+      );
+      expect(storage.audit.list(conversationId)).toMatchObject([
+        { id: auditId, status: 'pending' },
+      ]);
+      storage.audit.finish(auditId, 'uncertain');
+      const secondId = randomUUID();
+      storage.audit.record({
+        id: secondId,
+        conversationId,
+        deviceId: 'light.bedroom',
+        state: 'off',
+        status: 'succeeded',
+        createdAt: '2026-10-10T00:00:00Z',
+      });
+      expect(
+        storage.audit.list(conversationId).map((entry) => entry.id),
+      ).toEqual([auditId, secondId]);
+      const inspection = new Database(filename, { readonly: true });
+      try {
+        expect(inspection.pragma('user_version', { simple: true })).toBe(2);
+        expect(inspection.pragma('foreign_key_check')).toEqual([]);
+        expect(inspection.pragma('integrity_check')).toEqual([
+          { integrity_check: 'ok' },
+        ]);
+      } finally {
+        inspection.close();
+      }
+    } finally {
+      storage.close();
+      rmSync(directory, { recursive: true, force: true });
     }
   });
 });

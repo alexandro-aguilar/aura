@@ -10,6 +10,7 @@ import type {
   Message,
 } from '@aura/domain';
 import { ChatService, DeviceTools, MockLightPolicy } from './index.js';
+import { DeviceGatewayError } from '@aura/domain';
 
 const runtime = { id: randomUUID, now: () => '2026-10-10T12:00:00.000Z' };
 function memory() {
@@ -129,6 +130,66 @@ describe('device operation boundary', () => {
     ).rejects.toThrow('Unavailable');
     expect(entries[0]?.status).toBe('failed');
   });
+  it('leaves an uncertain pending audit when finalization fails without repeating execution', async () => {
+    const { tools, devices, audit, entries } = setup();
+    vi.spyOn(audit, 'finish').mockImplementation(() => {
+      throw new Error('Disk full after execution');
+    });
+    await expect(
+      tools.setLight('conversation', {
+        deviceId: 'light.living_room',
+        state: 'on',
+      }),
+    ).rejects.toThrow('Disk full after execution');
+    expect(devices.setLight).toHaveBeenCalledTimes(1);
+    expect(entries[0]?.status).toBe('pending');
+  });
+  it('records uncertain physical outcomes distinctly from definite failures', async () => {
+    const { tools, devices, entries } = setup();
+    vi.mocked(devices.setLight).mockRejectedValue(
+      new DeviceGatewayError('OPERATION_UNCERTAIN', 'Inspect the light.'),
+    );
+    await expect(
+      tools.setLight('conversation', {
+        deviceId: 'light.living_room',
+        state: 'on',
+      }),
+    ).rejects.toMatchObject({ code: 'OPERATION_UNCERTAIN' });
+    expect(entries[0]?.status).toBe('uncertain');
+  });
+  it('prevents concurrent writes to the same light across conversations and releases its guard', async () => {
+    const { tools, devices, entries } = setup();
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    vi.mocked(devices.setLight).mockImplementationOnce(async (operation) => {
+      await gate;
+      return { id: operation.deviceId, name: 'Light', state: operation.state };
+    });
+    const first = tools.setLight('one', {
+      deviceId: 'light.living_room',
+      state: 'on',
+    });
+    try {
+      await expect(
+        tools.setLight('two', { deviceId: 'light.living_room', state: 'off' }),
+      ).rejects.toMatchObject({ code: 'BUSY' });
+      expect(devices.setLight).toHaveBeenCalledTimes(1);
+    } finally {
+      release();
+    }
+    await first;
+    await tools.setLight('three', {
+      deviceId: 'light.living_room',
+      state: 'off',
+    });
+    expect(entries.map((entry) => entry.status)).toEqual([
+      'succeeded',
+      'failed',
+      'succeeded',
+    ]);
+  });
 });
 
 describe('chat use case', () => {
@@ -195,7 +256,7 @@ describe('chat use case', () => {
     );
     expect(messages.map((item) => item.role)).toEqual(['user']);
   });
-  it('serializes requests per conversation and releases the lock on cancellation', async () => {
+  it('rejects overlapping requests per conversation and releases the lock on cancellation', async () => {
     const { repository } = memory();
     const id = randomUUID();
     repository.create({ id, createdAt: runtime.now() });

@@ -25,19 +25,29 @@ export function openPersistence(filename: string): Persistence {
   sqlite.pragma('journal_mode = WAL');
   sqlite.pragma('busy_timeout = 5000');
   const version = sqlite.pragma('user_version', { simple: true });
-  if (version === 0) {
-    sqlite.transaction(() => {
-      sqlite.exec(
-        readFileSync(
-          new URL('../migrations/0001_initial.sql', import.meta.url),
-          'utf8',
-        ),
-      );
-      sqlite.pragma('user_version = 1');
-    })();
-  } else if (version !== 1) {
+  const migrations = ['0001_initial.sql', '0002_uncertain_audit.sql'];
+  try {
+    if (
+      typeof version !== 'number' ||
+      !Number.isInteger(version) ||
+      version < 0 ||
+      version > migrations.length
+    )
+      throw new Error('Unsupported database schema version');
+    for (let index = version; index < migrations.length; index++) {
+      sqlite.transaction(() => {
+        sqlite.exec(
+          readFileSync(
+            new URL(`../migrations/${migrations[index]}`, import.meta.url),
+            'utf8',
+          ),
+        );
+        sqlite.pragma(`user_version = ${index + 1}`);
+      })();
+    }
+  } catch (error) {
     sqlite.close();
-    throw new Error('Unsupported database schema version');
+    throw error;
   }
   const db = drizzle(sqlite);
   const conversationRepository: ConversationRepository = {

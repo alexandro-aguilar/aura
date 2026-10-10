@@ -4,3 +4,5 @@ dist
 yarn.lock
 data
 AGENTS.md
+
+.env.home-assistant.local*

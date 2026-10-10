@@ -2,20 +2,35 @@ import Fastify from 'fastify';
 import websocket from '@fastify/websocket';
 import { randomUUID } from 'node:crypto';
 import type { ChatAgent, Runtime } from '@aura/domain';
+import { DeviceGatewayError } from '@aura/domain';
 import {
   ApplicationError,
   ChatService,
   DeviceTools,
-  MockLightPolicy,
+  AllowedLightPolicy,
+  DirectLightControl,
+  DirectControlError,
 } from '@aura/application';
 import { MockChatAgent } from '@aura/agent';
-import { chatRequestSchema } from '@aura/contracts';
-import { MockDeviceGateway, MOCK_LIGHT_IDS } from '@aura/integrations';
+import { chatRequestSchema, deviceControlRequestSchema } from '@aura/contracts';
+import {
+  HomeAssistantDeviceGateway,
+  MockDeviceGateway,
+  MOCK_LIGHT_IDS,
+} from '@aura/integrations';
 import { openPersistence } from '@aura/persistence';
 import type { Config } from './config.js';
 
 function publicError(error: unknown) {
-  if (error instanceof ApplicationError)
+  if (error instanceof DirectControlError)
+    return {
+      code: error.code,
+      message: error.message,
+      conversationId: error.conversationId,
+      operationId: error.operationId,
+      observedDevice: error.observedDevice,
+    };
+  if (error instanceof ApplicationError || error instanceof DeviceGatewayError)
     return { code: error.code, message: error.message };
   return {
     code: 'AGENT_ERROR',
@@ -23,10 +38,23 @@ function publicError(error: unknown) {
       'The request failed. Check the server logs and device state before retrying.',
   };
 }
+function operationStatus(code: string) {
+  if (code === 'NOT_FOUND') return 404;
+  if (['FORBIDDEN', 'READ_ONLY', 'DEVICE_NOT_ALLOWED'].includes(code))
+    return 403;
+  if (['BUSY', 'OPERATION_UNCERTAIN', 'DEVICE_NOT_READY'].includes(code))
+    return 409;
+  if (code.startsWith('DEVICE_')) return 503;
+  return 502;
+}
 
 export async function buildServer(
   config: Config,
-  options: { logger?: boolean; agent?: ChatAgent } = {},
+  options: {
+    logger?: boolean;
+    agent?: ChatAgent;
+    deviceFetch?: typeof globalThis.fetch;
+  } = {},
 ) {
   const app = Fastify({ logger: options.logger ?? true, bodyLimit: 16384 });
   const persistence = openPersistence(config.databasePath);
@@ -39,14 +67,31 @@ export async function buildServer(
     id: randomUUID,
     now: () => new Date().toISOString(),
   };
-  const devices = new MockDeviceGateway();
+  const simulated = config.deviceBackend.mode === 'mock';
+  const readOnly =
+    config.deviceBackend.mode === 'home-assistant' &&
+    config.deviceBackend.writeLightIds.length === 0;
+  const devices =
+    config.deviceBackend.mode === 'mock'
+      ? new MockDeviceGateway()
+      : new HomeAssistantDeviceGateway(
+          config.deviceBackend,
+          options.deviceFetch,
+        );
   const tools = new DeviceTools(
     devices,
-    new MockLightPolicy(new Set(MOCK_LIGHT_IDS)),
+    new AllowedLightPolicy(
+      new Set(
+        config.deviceBackend.mode === 'mock'
+          ? MOCK_LIGHT_IDS
+          : config.deviceBackend.writeLightIds,
+      ),
+    ),
     persistence.audit,
     runtime,
   );
-  let agent: ChatAgent = options.agent ?? new MockChatAgent(tools);
+  let agent: ChatAgent =
+    options.agent ?? new MockChatAgent(tools, { readOnly, simulated });
   if (!options.agent && config.mode === 'openai') {
     try {
       const { createOpenAIModel } = await import('@aura/integrations/openai');
@@ -54,6 +99,7 @@ export async function buildServer(
       agent = new StrandsChatAgent(
         createOpenAIModel(config.apiKey, config.model),
         tools,
+        { readOnly, simulated },
       );
     } catch (error) {
       await app.close();
@@ -61,6 +107,11 @@ export async function buildServer(
     }
   }
   const chat = new ChatService(persistence.conversations, agent, runtime);
+  const controls = new DirectLightControl(
+    persistence.conversations,
+    tools,
+    runtime,
+  );
   await app.register(websocket, { options: { maxPayload: 16384 } });
   // Local single-user scaffold. Guard browser origins on both transports.
   app.addHook('onRequest', async (request, reply) => {
@@ -70,9 +121,44 @@ export async function buildServer(
   });
   app.get('/health', async () => {
     persistence.health();
-    return { status: 'ok', mode: config.mode, devices: 'mock' };
+    return {
+      status: 'ok',
+      mode: config.mode,
+      devices: config.deviceBackend.mode,
+    };
   });
-  app.get('/devices', async () => devices.list());
+  app.get('/devices', async (request, reply) => {
+    try {
+      return await devices.list();
+    } catch (error) {
+      request.log.error({ err: error }, 'Device listing failed');
+      if (error instanceof DeviceGatewayError)
+        return reply.code(503).send(publicError(error));
+      throw error;
+    }
+  });
+  app.post('/device-operations', async (request, reply) => {
+    const parsed = deviceControlRequestSchema.safeParse(request.body);
+    if (!parsed.success)
+      return reply
+        .code(400)
+        .send({ code: 'INVALID_REQUEST', message: 'Invalid light operation.' });
+    try {
+      return await controls.execute(parsed.data);
+    } catch (error) {
+      request.log.error({ err: error }, 'Direct light operation failed');
+      const failure = publicError(error);
+      return reply.code(operationStatus(failure.code)).send(failure);
+    }
+  });
+  app.get<{ Params: { id: string } }>(
+    '/conversations/:id/audit',
+    async (request, reply) => {
+      if (!persistence.conversations.exists(request.params.id))
+        return reply.code(404).send({ error: 'Conversation not found' });
+      return persistence.audit.list(request.params.id);
+    },
+  );
   app.get<{ Params: { id: string } }>(
     '/conversations/:id/messages',
     async (request, reply) => {

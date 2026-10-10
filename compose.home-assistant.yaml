@@ -1,0 +1,10 @@
+# Apply with compose.yaml only after starting deploy/home-assistant/compose.yaml.
+services:
+  api:
+    networks:
+      - default
+      - home-assistant
+networks:
+  home-assistant:
+    external: true
+    name: aura-home-assistant_default

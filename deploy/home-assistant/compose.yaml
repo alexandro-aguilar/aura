@@ -1,0 +1,28 @@
+name: aura-home-assistant
+services:
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:2026.10.1
+    platform: linux/arm64
+    restart: unless-stopped
+    stop_grace_period: 60s
+    environment:
+      TZ: America/Merida
+    ports:
+      - '127.0.0.1:8123:8123'
+    volumes:
+      - home-assistant-data:/config
+      - ./configuration.yaml:/config/configuration.yaml:ro
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'python3',
+          '-c',
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8123/', timeout=5)",
+        ]
+      interval: 10s
+      timeout: 10s
+      start_period: 90s
+      retries: 18
+volumes:
+  home-assistant-data:

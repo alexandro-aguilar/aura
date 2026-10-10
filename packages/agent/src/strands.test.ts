@@ -1,19 +1,28 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import { randomUUID } from 'node:crypto';
 import { OpenAIModel } from '@strands-agents/sdk/models/openai';
+import { DeviceGatewayError } from '@aura/domain';
 import type {
   AuditEntry,
   AuditRepository,
   DeviceGateway,
   LightOperation,
 } from '@aura/domain';
-import { DeviceTools, MockLightPolicy } from '@aura/application';
+import { DeviceTools, AllowedLightPolicy } from '@aura/application';
 import { StrandsChatAgent } from './strands.js';
 
 afterEach(() => vi.unstubAllGlobals());
-
-// Exercises the real pinned SDK and provider protocol without a network call or API key.
-it('runs the Strands tool loop against fixture OpenAI SSE responses', async () => {
+function frames(delta: unknown, finishReason: string) {
+  const chunk = (value: unknown, finish: string | null) => ({
+    id: 'fixture',
+    object: 'chat.completion.chunk',
+    created: 0,
+    model: 'fixture-model',
+    choices: [{ index: 0, delta: value, finish_reason: finish }],
+  });
+  return `data: ${JSON.stringify(chunk(delta, null))}\n\ndata: ${JSON.stringify(chunk({}, finishReason))}\n\ndata: [DONE]\n\n`;
+}
+function setup(calls: { name: string; arguments: object }[], answer: string) {
   const entries: AuditEntry[] = [];
   const audit: AuditRepository = {
     record: (entry) => {
@@ -27,7 +36,12 @@ it('runs the Strands tool loop against fixture OpenAI SSE responses', async () =
   };
   const devices: DeviceGateway = {
     list: async () => [
-      { id: 'light.living_room', name: 'Living room', state: 'off' },
+      {
+        id: 'light.living_room',
+        name: 'Living room',
+        state: 'off',
+        canControl: true,
+      },
     ],
     setLight: vi.fn(async ({ deviceId, state }: LightOperation) => ({
       id: deviceId,
@@ -37,23 +51,13 @@ it('runs the Strands tool loop against fixture OpenAI SSE responses', async () =
   };
   const tools = new DeviceTools(
     devices,
-    new MockLightPolicy(new Set(['light.living_room'])),
+    new AllowedLightPolicy(new Set(['light.living_room'])),
     audit,
     { id: randomUUID, now: () => new Date().toISOString() },
   );
-  const frames = (delta: unknown, finishReason: string) => {
-    const chunk = (value: unknown, finish: string | null) => ({
-      id: 'fixture',
-      object: 'chat.completion.chunk',
-      created: 0,
-      model: 'fixture-model',
-      choices: [{ index: 0, delta: value, finish_reason: finish }],
-    });
-    return `data: ${JSON.stringify(chunk(delta, null))}\n\ndata: ${JSON.stringify(chunk({}, finishReason))}\n\ndata: [DONE]\n\n`;
-  };
-  const fetch = vi
-    .fn()
-    .mockResolvedValueOnce(
+  const fetch = vi.fn<typeof globalThis.fetch>();
+  calls.forEach((call, index) =>
+    fetch.mockResolvedValueOnce(
       new Response(
         frames(
           {
@@ -61,14 +65,11 @@ it('runs the Strands tool loop against fixture OpenAI SSE responses', async () =
             tool_calls: [
               {
                 index: 0,
-                id: 'call_fixture',
+                id: `call_${index}`,
                 type: 'function',
                 function: {
-                  name: 'set_light',
-                  arguments: JSON.stringify({
-                    deviceId: 'light.living_room',
-                    state: 'on',
-                  }),
+                  name: call.name,
+                  arguments: JSON.stringify(call.arguments),
                 },
               },
             ],
@@ -77,23 +78,22 @@ it('runs the Strands tool loop against fixture OpenAI SSE responses', async () =
         ),
         { headers: { 'content-type': 'text/event-stream' } },
       ),
-    )
-    .mockResolvedValueOnce(
-      new Response(
-        frames(
-          { role: 'assistant', content: 'Living room light is on (mock).' },
-          'stop',
-        ),
-        { headers: { 'content-type': 'text/event-stream' } },
-      ),
-    );
+    ),
+  );
+  fetch.mockResolvedValueOnce(
+    new Response(frames({ role: 'assistant', content: answer }, 'stop'), {
+      headers: { 'content-type': 'text/event-stream' },
+    }),
+  );
   vi.stubGlobal('fetch', fetch);
   const model = new OpenAIModel({
     api: 'chat',
     apiKey: 'fixture-only',
     modelId: 'fixture-model',
   });
-  const agent = new StrandsChatAgent(model, tools);
+  return { entries, devices, tools, fetch, model };
+}
+async function collect(agent: StrandsChatAgent) {
   let response = '';
   for await (const text of agent.stream({
     conversationId: randomUUID(),
@@ -101,11 +101,73 @@ it('runs the Strands tool loop against fixture OpenAI SSE responses', async () =
     history: [],
   }))
     response += text;
-  expect(response).toBe('Living room light is on (mock).');
-  expect(devices.setLight).toHaveBeenCalledExactlyOnceWith({
-    deviceId: 'light.living_room',
-    state: 'on',
-  });
-  expect(entries).toMatchObject([{ status: 'succeeded' }]);
+  return response;
+}
+// Executes the pinned SDK and provider protocol without a provider/network call.
+it.each([
+  { readOnly: false, simulated: true },
+  { readOnly: true, simulated: false },
+  { readOnly: false, simulated: false },
+])('runs the actual SDK tool loop (%j)', async (options) => {
+  const answer = options.readOnly
+    ? 'Living room light is off.'
+    : `Living room light is on${options.simulated ? ' (mock)' : ''}.`;
+  const { entries, devices, tools, fetch, model } = setup(
+    [
+      {
+        name: options.readOnly ? 'list_devices' : 'set_light',
+        arguments: options.readOnly
+          ? {}
+          : { deviceId: 'light.living_room', state: 'on' },
+      },
+    ],
+    answer,
+  );
+  expect(await collect(new StrandsChatAgent(model, tools, options))).toBe(
+    answer,
+  );
+  const request = JSON.parse(String(fetch.mock.calls[0]?.[1]?.body));
+  if (options.readOnly) {
+    expect(devices.setLight).not.toHaveBeenCalled();
+    expect(entries).toEqual([]);
+    expect(
+      request.tools.map(
+        (entry: { function: { name: string } }) => entry.function.name,
+      ),
+    ).toEqual(['list_devices']);
+  } else {
+    expect(devices.setLight).toHaveBeenCalledExactlyOnceWith({
+      deviceId: 'light.living_room',
+      state: 'on',
+    });
+    expect(entries).toMatchObject([{ status: 'succeeded' }]);
+    if (!options.simulated)
+      expect(JSON.stringify(request.messages)).toContain(
+        'real Home Assistant lights',
+      );
+  }
   expect(fetch).toHaveBeenCalledTimes(2);
+});
+it('blocks model-initiated retries after an uncertain physical operation', async () => {
+  const operation = {
+    name: 'set_light',
+    arguments: { deviceId: 'light.living_room', state: 'on' },
+  };
+  const { entries, devices, tools, fetch, model } = setup(
+    [operation, operation],
+    'Inspect the light state before deciding what to do.',
+  );
+  vi.mocked(devices.setLight).mockRejectedValue(
+    new DeviceGatewayError(
+      'OPERATION_UNCERTAIN',
+      'Inspect state before retrying.',
+    ),
+  );
+  expect(
+    await collect(new StrandsChatAgent(model, tools, { simulated: false })),
+  ).toContain('Inspect');
+  expect(devices.setLight).toHaveBeenCalledTimes(1);
+  expect(entries).toMatchObject([{ status: 'uncertain' }]);
+  expect(entries).toHaveLength(1);
+  expect(String(fetch.mock.calls[2]?.[1]?.body)).toContain('already attempted');
 });

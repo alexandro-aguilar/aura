@@ -1,51 +1,32 @@
-# MVP 1 implementation plan
+# Project delivery plan
 
-Implement one thin vertical slice: a user sends a chat message, the agent may invoke a narrow mock-light tool, the server authorizes that operation, and the response streams back while history and execution audit are stored in SQLite.
+Read [AGENTS.md](../AGENTS.md), [README](../README.md) and the [specifications index](specs/README.md) before implementation. Deliver one thin vertical slice at a time. MVP1 backend/container closure is recorded in [the verification evidence](verification/mvp1-closure.md). MVP2 software and the local macOS Home Assistant deployment are implemented and [verified](verification/mvp2.md). Raspberry Pi acceptance is deferred by the user until hardware is supplied; visual browser and physical-device checks remain open. Preserve the mock baseline and do not begin later phases without selecting that work.
 
-1. Verify official SDK documentation, runtime requirements, tool APIs, OpenAI provider APIs, and streaming events. Pin direct dependencies.
-2. Scaffold Yarn workspaces, strict TypeScript, public package exports, and boundary checks.
-3. Define pure domain ports; implement chat orchestration and a default-deny device policy through dependency injection.
-4. Add SQLite/Drizzle repositories with a versioned initial migration. Store messages in insertion order and audit device attempts before execution.
-5. Implement credential-free mock chat and mock devices. Isolate the real Strands/OpenAI adapter behind the same agent port.
-6. Add Fastify HTTP chat, WebSocket streaming, healthcheck, structured logging, validated transport contracts, and a minimal React/Vite PWA shell.
-7. Add behavior tests and integration tests, local setup instructions, and ARM64 Docker Compose configuration.
+## Ordered phases
 
-## Repository structure
+| Phase | Outcome                                                              | Plan                                    | Dependency/status                                            |
+| ----- | -------------------------------------------------------------------- | --------------------------------------- | ------------------------------------------------------------ |
+| MVP1  | Streaming chat, mock lights, SQLite, PWA shell and ARM64 Compose     | [Closure and validation](plans/mvp1.md) | Backend/container closure passed; browser checks remain open |
+| MVP2  | Narrow Home Assistant lights and provider-independent local controls | [Home Assistant](plans/mvp2.md)         | Implemented and locally verified; Pi acceptance deferred     |
+| MVP3  | Browser push-to-talk and physical satellite STT/agent/TTS            | [Voice](plans/mvp3.md)                  | Proposed; start after MVP2 exit                              |
+| MVP4  | Wake word, explicit memory and bounded event automation              | [Advanced capabilities](plans/mvp4.md)  | Proposed; start after MVP3 exit; deliver separately          |
 
-```text
-apps/
-  api/src/                 Fastify routes, configuration, composition root
-  web/src/                 React chat UI
-  web/public/              Manifest and offline shell assets
-  voice-satellite/src/     Reserved for MVP 3
-packages/
-  domain/src/              Pure entities, types, ports
-  application/src/         ChatService, DeviceTools, authorization policy
-  agent/src/               MockChatAgent and StrandsChatAgent
-  integrations/src/        MockDeviceGateway and OpenAI model factory
-  persistence/src/         Drizzle schema and SQLite repositories
-  persistence/migrations/  Versioned SQL
-  contracts/src/           Zod request, operation, and stream schemas
-scripts/                   Dependency-free boundary verification
-docs/                      Plan and SDK evidence
-```
+See [architecture](specs/architecture.md) for package ownership and dependency rules. Specs define acceptance; phase plans define task order and evidence. Later-phase plans are design proposals, not statements that features already exist.
 
-## Boundaries and ownership
+## Working process
 
-Domain has no external dependencies. Application depends on domain ports and validated contracts. Agent depends on application tools, never on a concrete device adapter or database. Integrations and persistence implement domain ports. The API composition root chooses implementations and supplies IDs, clocks, authorization grants, and credentials. Web imports only contracts.
+1. Select the next unfinished slice in the current phase and its requirement IDs.
+2. Recheck official SDK/API documentation before SDK changes and record exact compatible pins. Use the existing stack; ask before major dependencies or architecture changes.
+3. Resolve blocking product/security choices for that slice. Continue independent mock work while hardware or deployment decisions remain open.
+4. Implement contracts/domain ports, application behavior, adapters and transport/UI as the slice requires. Keep authorization and auditing in the application path.
+5. Add meaningful unit and integration tests for success, invalid input, policy denial, dependency failure and restart/disconnect where relevant.
+6. Run affected checks, then the phase exit checks. Update setup docs, compatibility evidence and limitations with actual results.
+7. Review the exit gate before selecting work from the next phase. Do not advance on historical evidence alone when relevant code or dependencies have changed.
 
-Package exports resolve compiled output. Build workspaces in dependency order before starting development; rebuild shared packages after editing them. This keeps runtime imports and production Node.js execution consistent without a bundler or extra monorepo framework.
+Each implementation task should record requirement IDs, affected packages, dependencies, acceptance scenarios, validation commands/results and unresolved limitations. Task IDs in the phase plans can be used directly in issues or PRs; creating external issues is outside this documentation change.
 
-## Acceptance checks
+## Verification and release evidence
 
-- Fresh mock startup needs no API key, Home Assistant, microphone, or Raspberry Pi.
-- HTTP chat can change a mock light, persist both turns, and write an execution audit entry.
-- WebSocket events arrive as `started`, text `delta` events, and `done`; failures produce `error`.
-- Untrusted tool inputs fail validation; ungranted device IDs are denied before execution.
-- SQLite data survives reopening; foreign keys prevent orphan records.
-- Fixture SSE responses exercise the real Strands/OpenAI tool loop without external requests.
-- Workspace boundary checks prevent domain/vendor coupling and server imports into web.
+The local baseline is `yarn install --immutable`, `yarn check`, `yarn format:check` and `docker compose config --quiet`. Container changes require actual build/start and smoke checks from README, not configuration validation alone. Check `docker info`; if needed start the existing Colima default profile according to AGENTS.md. Retain its configuration and leave it running.
 
-## Scope limits
-
-Home Assistant and MQTT adapters, voice transport, push-to-talk, wake word, long-term memory, automation, and sensitive-action confirmation are later phases. The satellite workspace contains only a placeholder. All device changes are simulated. The single-user API binds to loopback by default; identity and remote access are outside this MVP. The browser caches only the app shell; device requests are never queued offline.
+Record date, platform, commit when available, configuration mode, commands, results and known gaps. Never label fixtures as live provider validation or emulated/container ARM64 execution as physical Pi validation. Keep a simulated route available throughout development.

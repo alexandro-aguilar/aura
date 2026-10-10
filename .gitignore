@@ -6,3 +6,5 @@ data/
 coverage/
 *.tsbuildinfo
 .DS_Store
+
+.env.home-assistant.local*

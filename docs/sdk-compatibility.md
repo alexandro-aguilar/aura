@@ -31,3 +31,17 @@ After refreshing the install, the required `@modelcontextprotocol/client` peer i
 The fixture test at `packages/agent/src/strands.test.ts` now passes: it runs the actual installed SDK, receives a fixture OpenAI tool call, executes an authorized light operation, sends the tool result through the SDK, and consumes the final response. It requires no real API key or provider traffic. Live provider traffic has not been tested.
 
 Formatting, workspace boundaries, and Docker Compose configuration checks pass. Both `linux/arm64` images build with immutable installs and run under Colima. Runtime checks pass for health, nginx app/PWA asset serving, HTTP chat, proxied WebSocket streaming, mock light operations, request validation, and origin enforcement. Conversation history and successful device execution audit entries survive an API container restart; SQLite integrity and foreign-key checks pass. The API runs as the non-root Node user. Docker now uses immutable installs against the lockfile.
+
+## Read-only MVP2 tool configuration
+
+The first Home Assistant slice retains the same SDK/dependency pins. Official [Strands tool documentation](https://strandsagents.com/docs/user-guide/sdk/tools/) was rechecked on 2026-10-10; the installed SDK remains the runtime basis. Read-only mode changes the prompt and registers only list_devices. The actual SDK fixture now covers both mock writes and read-only discovery. This does not imply a live-provider test. See [MVP2 verification](verification/mvp2-read-only.md) for the historical 59-test result and [Home Assistant API decisions](specs/mvp2-read-only.md) for the separate REST adapter.
+
+## Full MVP2 verification
+
+Official HA REST/authentication and Strands tool documentation were rechecked on 2026-10-10. Existing application SDK/dependency pins remain unchanged. The current check passes 87 tests across seven suites. Four actual installed-SDK fixture scenarios cover mock writes, read-only discovery, HA wording/write dispatch and a model retry attempt blocked by the per-turn same-light guard. No live OpenAI request was made.
+
+Home Assistant Container 2026.10.1 is installed and validated on this Mac with simulated template lights through the real REST API. HTTP chat, WebSocket chat and direct writes, audit/history restart durability and HA outage/recovery pass. See [current MVP2 evidence](verification/mvp2.md) and [deployment decisions](deployment/home-assistant.md). Raspberry Pi and physical devices remain deferred.
+
+## Live OpenAI follow-up
+
+The user supplied server-only OpenAI configuration on 2026-10-10. Four live gpt-5.4 chat turns passed through the pinned Strands/OpenAI adapter: discovery, authorized on, streamed off, conversation recall and model refusal of an ungranted light. Actual HA state, two succeeded write audits and eight ordered persisted messages were checked. No SDK or production-code changes were required. See [live acceptance evidence](verification/mvp2.md#live-openai-acceptance). Earlier no-live-provider statements describe their original fixture-only checkpoints.

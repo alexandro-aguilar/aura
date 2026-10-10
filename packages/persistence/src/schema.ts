@@ -23,7 +23,7 @@ export const audit = sqliteTable('execution_audit', {
   deviceId: text('device_id').notNull(),
   state: text('state', { enum: ['on', 'off'] }).notNull(),
   status: text('status', {
-    enum: ['pending', 'succeeded', 'denied', 'failed'],
+    enum: ['pending', 'succeeded', 'denied', 'failed', 'uncertain'],
   }).notNull(),
   createdAt: text('created_at').notNull(),
 });
