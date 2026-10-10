@@ -23,6 +23,8 @@ Goal: Raspberry Pi 5 home intelligence assistant using TypeScript, Strands Agent
 
 See [AGENTS.md](AGENTS.md) for implementation guardrails, [project specifications](docs/specs/README.md) for requirements and architecture, [the delivery plan](docs/implementation-plan.md) for phase order and acceptance gates, and [SDK compatibility evidence](docs/sdk-compatibility.md) for the verified API basis and outstanding runtime checks.
 
+For a guided first run, follow the [step-by-step manual testing guide](docs/manual-testing.md): startup, chat, light controls, voice, preferences, automations, and optional integrations, with expected results and a test checklist.
+
 ## MVP1 through MVP4
 
 The scaffold contains a strict TypeScript Yarn monorepo, Fastify HTTP and WebSocket chat, a React/Vite PWA shell, SQLite/Drizzle conversation storage, and an audited mock-light tool. Default mock mode is deterministic and requires no API key, Home Assistant, Raspberry Pi, microphone, or speaker.

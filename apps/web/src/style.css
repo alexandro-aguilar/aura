@@ -35,6 +35,11 @@ header > p {
 section {
   min-height: 300px;
 }
+.conversation {
+  min-height: min(300px, 50vh);
+  max-height: 50vh;
+  overflow-y: auto;
+}
 .welcome {
   padding: 2rem 0;
 }

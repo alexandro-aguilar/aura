@@ -13,6 +13,7 @@ import './style.css';
 import { AutomationsPanel } from './AutomationsPanel.js';
 import { PreferencesPanel } from './PreferencesPanel.js';
 import { VoicePanel } from './VoicePanel.js';
+import { scheduleChatConnection } from './chat-connection.js';
 
 interface Line {
   role: 'user' | 'assistant';
@@ -43,6 +44,14 @@ function App() {
   const socket = useRef<WebSocket | null>(null);
   const deviceRequest = useRef<AbortController | null>(null);
   const controlInFlight = useRef(false);
+  const conversationView = useRef<HTMLElement | null>(null);
+  const composerView = useRef<HTMLFormElement | null>(null);
+  useEffect(() => {
+    const view = conversationView.current;
+    if (view) view.scrollTop = view.scrollHeight;
+    if (lines.length > 0)
+      composerView.current?.scrollIntoView({ block: 'nearest' });
+  }, [lines]);
   async function setLight(device: Device, state: 'on' | 'off') {
     if (controlInFlight.current) return;
     controlInFlight.current = true;
@@ -120,45 +129,53 @@ function App() {
     }
   }
   useEffect(() => {
-    const connection = new WebSocket(
+    const disconnect = scheduleChatConnection(
       `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/api/chat/stream`,
+      (connection) => {
+        socket.current = connection;
+        connection.onopen = () => setStatus('Connected');
+        connection.onclose = () => {
+          setStatus('Disconnected · reload to reconnect');
+          setBusy(false);
+        };
+        connection.onerror = () =>
+          setError(
+            `Could not connect to the API. Check that it is running and WEB_ORIGIN matches ${location.origin}. For the default setup, open http://localhost:5173.`,
+          );
+        connection.onmessage = (event: MessageEvent<string>) => {
+          try {
+            const parsed = chatEventSchema.parse(JSON.parse(event.data));
+            if (parsed.type === 'started')
+              conversationId.current = parsed.conversationId;
+            if (parsed.type === 'delta')
+              setLines((current) => {
+                const last = current.at(-1);
+                return last?.role === 'assistant'
+                  ? [
+                      ...current.slice(0, -1),
+                      {
+                        role: 'assistant',
+                        content: last.content + parsed.text,
+                      },
+                    ]
+                  : [...current, { role: 'assistant', content: parsed.text }];
+              });
+            if (parsed.type === 'done') {
+              setBusy(false);
+              void refreshDevices();
+            }
+            if (parsed.type === 'error') {
+              setError(parsed.message);
+              setBusy(false);
+              void refreshDevices();
+            }
+          } catch {
+            setError('The server sent an invalid response.');
+            setBusy(false);
+          }
+        };
+      },
     );
-    socket.current = connection;
-    connection.onopen = () => setStatus('Connected');
-    connection.onclose = () => {
-      setStatus('Disconnected · reload to reconnect');
-      setBusy(false);
-    };
-    connection.onerror = () => setError('Could not connect to the API.');
-    connection.onmessage = (event: MessageEvent<string>) => {
-      try {
-        const parsed = chatEventSchema.parse(JSON.parse(event.data));
-        if (parsed.type === 'started')
-          conversationId.current = parsed.conversationId;
-        if (parsed.type === 'delta')
-          setLines((current) => {
-            const last = current.at(-1);
-            return last?.role === 'assistant'
-              ? [
-                  ...current.slice(0, -1),
-                  { role: 'assistant', content: last.content + parsed.text },
-                ]
-              : [...current, { role: 'assistant', content: parsed.text }];
-          });
-        if (parsed.type === 'done') {
-          setBusy(false);
-          void refreshDevices();
-        }
-        if (parsed.type === 'error') {
-          setError(parsed.message);
-          setBusy(false);
-          void refreshDevices();
-        }
-      } catch {
-        setError('The server sent an invalid response.');
-        setBusy(false);
-      }
-    };
     void fetch('/api/health')
       .then((response) => response.json())
       .then((health: { mode: string; devices: string }) => {
@@ -169,8 +186,8 @@ function App() {
     void refreshDevices();
     return () => {
       deviceRequest.current?.abort();
-      connection.onclose = null;
-      connection.close();
+      disconnect();
+      socket.current = null;
     };
   }, []);
   function submit(event: FormEvent) {
@@ -285,7 +302,12 @@ function App() {
           </div>
         )}
       </aside>
-      <section aria-label="Conversation" aria-live="polite">
+      <section
+        ref={conversationView}
+        className="conversation"
+        aria-label="Conversation"
+        aria-live="polite"
+      >
         {lines.length === 0 && (
           <div className="welcome">
             <h2>Start with a light.</h2>
@@ -309,26 +331,7 @@ function App() {
         ))}
         {busy && <p role="status">Aura is responding…</p>}
       </section>
-      {error && (
-        <p role="alert" className="error">
-          {error}
-        </p>
-      )}
-      <PreferencesPanel />
-      <AutomationsPanel />
-      <VoicePanel
-        disabled={busy || voiceBusy}
-        conversationId={() => conversationId.current}
-        onConversation={(id) => {
-          conversationId.current = id;
-        }}
-        onLine={(role, content) =>
-          setLines((current) => [...current, { role, content }])
-        }
-        onBusy={setVoiceBusy}
-        onComplete={() => void refreshDevices()}
-      />
-      <form onSubmit={submit}>
+      <form ref={composerView} onSubmit={submit}>
         <label htmlFor="message">Message Aura</label>
         <div className="composer">
           <input
@@ -352,6 +355,25 @@ function App() {
           </button>
         </div>
       </form>
+      {error && (
+        <p role="alert" className="error">
+          {error}
+        </p>
+      )}
+      <PreferencesPanel />
+      <AutomationsPanel />
+      <VoicePanel
+        disabled={busy || voiceBusy}
+        conversationId={() => conversationId.current}
+        onConversation={(id) => {
+          conversationId.current = id;
+        }}
+        onLine={(role, content) =>
+          setLines((current) => [...current, { role, content }])
+        }
+        onBusy={setVoiceBusy}
+        onComplete={() => void refreshDevices()}
+      />
     </main>
   );
 }
