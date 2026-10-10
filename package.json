@@ -1,0 +1,32 @@
+{
+  "name": "home-intelligence-agent",
+  "private": true,
+  "type": "module",
+  "packageManager": "yarn@4.13.0",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "tsx watch --env-file-if-exists=.env apps/api/src/main.ts",
+    "dev:web": "yarn workspace @aura/web dev",
+    "build": "yarn workspaces foreach -At --exclude home-intelligence-agent run build",
+    "typecheck": "yarn workspaces foreach -At --exclude home-intelligence-agent run typecheck && tsc -p tsconfig.test.json",
+    "test": "yarn build && vitest run",
+    "test:watch": "yarn build && vitest",
+    "check": "yarn check:boundaries && yarn build && yarn typecheck && vitest run",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check:boundaries": "node scripts/check-boundaries.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.15",
+    "prettier": "3.8.1",
+    "tsx": "4.22.4",
+    "typescript": "5.9.3",
+    "vitest": "4.1.9"
+  }
+}

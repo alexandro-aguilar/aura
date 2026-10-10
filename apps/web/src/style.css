@@ -1,0 +1,92 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #173b32;
+  background: #f4f5ef;
+  font-synthesis: none;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+h1 {
+  font-size: 4rem;
+  letter-spacing: -0.07em;
+  margin: 0.2rem 0;
+}
+header > p {
+  color: #53695f;
+}
+.eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+}
+.status {
+  font-size: 0.85rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #ccd6cc;
+}
+section {
+  min-height: 300px;
+}
+.welcome {
+  padding: 2rem 0;
+}
+article {
+  background: white;
+  border: 1px solid #dbe0d6;
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+}
+article.user {
+  background: #e2ece2;
+  margin-left: 2rem;
+}
+article p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+.composer {
+  display: flex;
+  gap: 0.5rem;
+}
+input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid #b0c0b1;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  font: inherit;
+}
+button {
+  background: #173b32;
+  color: white;
+  border: 0;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  font: inherit;
+  cursor: pointer;
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+:focus-visible {
+  outline: 3px solid #b58535;
+  outline-offset: 3px;
+}
+.error {
+  color: #9c2929;
+}

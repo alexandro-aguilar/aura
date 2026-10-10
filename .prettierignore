@@ -1,0 +1,6 @@
+.yarn
+node_modules
+dist
+yarn.lock
+data
+AGENTS.md

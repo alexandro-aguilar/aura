@@ -1,0 +1,38 @@
+services:
+  api:
+    build:
+      context: .
+      target: api
+    platform: linux/arm64
+    environment:
+      AGENT_MODE: ${AGENT_MODE:-mock}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5.4}
+      WEB_ORIGIN: http://localhost:8080
+    volumes:
+      - aura-data:/app/data
+    ports:
+      - '127.0.0.1:3001:3001'
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://localhost:3001/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+  web:
+    build:
+      context: .
+      target: web
+    platform: linux/arm64
+    ports:
+      - '127.0.0.1:8080:80'
+    depends_on:
+      api:
+        condition: service_healthy
+volumes:
+  aura-data:

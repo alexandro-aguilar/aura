@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.yarn/
+.env
+data/
+coverage/
+*.tsbuildinfo
+.DS_Store

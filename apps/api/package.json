@@ -1,0 +1,29 @@
+{
+  "name": "@aura/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@aura/agent": "workspace:*",
+    "@aura/application": "workspace:*",
+    "@aura/contracts": "workspace:*",
+    "@aura/domain": "workspace:*",
+    "@aura/integrations": "workspace:*",
+    "@aura/persistence": "workspace:*",
+    "@fastify/websocket": "11.3.1",
+    "fastify": "5.8.5"
+  },
+  "devDependencies": {
+    "@types/ws": "8.18.1"
+  }
+}
