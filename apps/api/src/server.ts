@@ -1,7 +1,12 @@
 import Fastify from 'fastify';
 import websocket from '@fastify/websocket';
 import { randomUUID } from 'node:crypto';
-import type { ChatAgent, Runtime } from '@aura/domain';
+import type {
+  ChatAgent,
+  Runtime,
+  SpeechToText,
+  TextToSpeech,
+} from '@aura/domain';
 import { DeviceGatewayError } from '@aura/domain';
 import {
   ApplicationError,
@@ -10,16 +15,25 @@ import {
   AllowedLightPolicy,
   DirectLightControl,
   DirectControlError,
+  PreferenceService,
+  AutomationService,
 } from '@aura/application';
 import { MockChatAgent } from '@aura/agent';
-import { chatRequestSchema, deviceControlRequestSchema } from '@aura/contracts';
+import {
+  chatRequestSchema,
+  deviceControlRequestSchema,
+  preferenceRequestSchema,
+} from '@aura/contracts';
 import {
   HomeAssistantDeviceGateway,
   MockDeviceGateway,
   MOCK_LIGHT_IDS,
+  DeviceStatePoller,
 } from '@aura/integrations';
 import { openPersistence } from '@aura/persistence';
 import type { Config } from './config.js';
+import { registerAutomations } from './automations.js';
+import { registerVoice } from './voice.js';
 
 function publicError(error: unknown) {
   if (error instanceof DirectControlError)
@@ -52,8 +66,10 @@ export async function buildServer(
   config: Config,
   options: {
     logger?: boolean;
+    automationPolling?: boolean;
     agent?: ChatAgent;
     deviceFetch?: typeof globalThis.fetch;
+    speech?: SpeechToText & TextToSpeech;
   } = {},
 ) {
   const app = Fastify({ logger: options.logger ?? true, bodyLimit: 16384 });
@@ -78,18 +94,14 @@ export async function buildServer(
           config.deviceBackend,
           options.deviceFetch,
         );
-  const tools = new DeviceTools(
-    devices,
-    new AllowedLightPolicy(
-      new Set(
-        config.deviceBackend.mode === 'mock'
-          ? MOCK_LIGHT_IDS
-          : config.deviceBackend.writeLightIds,
-      ),
+  const policy = new AllowedLightPolicy(
+    new Set(
+      config.deviceBackend.mode === 'mock'
+        ? MOCK_LIGHT_IDS
+        : config.deviceBackend.writeLightIds,
     ),
-    persistence.audit,
-    runtime,
   );
+  const tools = new DeviceTools(devices, policy, persistence.audit, runtime);
   let agent: ChatAgent =
     options.agent ?? new MockChatAgent(tools, { readOnly, simulated });
   if (!options.agent && config.mode === 'openai') {
@@ -106,12 +118,72 @@ export async function buildServer(
       throw error;
     }
   }
-  const chat = new ChatService(persistence.conversations, agent, runtime);
+  const chat = new ChatService(
+    persistence.conversations,
+    agent,
+    runtime,
+    config.memoryEnabled ? persistence.preferences : undefined,
+  );
+  const preferenceService = new PreferenceService(
+    persistence.preferences,
+    persistence.conversations,
+    runtime,
+  );
   const controls = new DirectLightControl(
     persistence.conversations,
     tools,
     runtime,
   );
+  const automations = new AutomationService(
+    persistence.automations,
+    controls,
+    policy,
+    new Set(
+      config.deviceBackend.mode === 'mock'
+        ? MOCK_LIGHT_IDS
+        : config.deviceBackend.lightIds,
+    ),
+    runtime,
+    config.automationsEnabled,
+  );
+  const poller = new DeviceStatePoller(devices, runtime);
+  let polling: Promise<void> | undefined;
+  let closing = false;
+  const pollAutomations = (): Promise<void> => {
+    if (
+      closing ||
+      !config.automationsEnabled ||
+      !persistence.automations.enabled()
+    ) {
+      poller.reset();
+      return Promise.resolve();
+    }
+    if (polling) return polling;
+    polling = (async () => {
+      for (const event of await poller.poll()) {
+        if (closing) break;
+        await automations.handle(event);
+      }
+    })().finally(() => {
+      polling = undefined;
+    });
+    return polling;
+  };
+  const timer =
+    config.automationsEnabled && options.automationPolling !== false
+      ? setInterval(() => {
+          void pollAutomations().catch(() =>
+            app.log.error(
+              'Automation polling failed; no event replay will occur.',
+            ),
+          );
+        }, config.automationPollMs).unref()
+      : undefined;
+  app.addHook('onClose', async () => {
+    closing = true;
+    clearInterval(timer);
+    await polling?.catch(() => {});
+  });
   await app.register(websocket, { options: { maxPayload: 16384 } });
   // Local single-user scaffold. Guard browser origins on both transports.
   app.addHook('onRequest', async (request, reply) => {
@@ -119,6 +191,49 @@ export async function buildServer(
     if (origin && origin !== config.webOrigin)
       return reply.code(403).send({ error: 'Origin not allowed' });
   });
+  registerAutomations(app, automations, () => poller.reset());
+  registerVoice(
+    app,
+    config,
+    chat,
+    persistence.conversations,
+    runtime,
+    activeStreams,
+    options.speech,
+  );
+  app.get('/preferences', async () => ({
+    enabled: config.memoryEnabled,
+    preferences: preferenceService.list(),
+  }));
+  app.post('/preferences', async (request, reply) => {
+    const parsed = preferenceRequestSchema.safeParse(request.body);
+    if (!parsed.success)
+      return reply.code(400).send({
+        code: 'INVALID_REQUEST',
+        message:
+          'Choose an allowed preference and explicitly approve saving it.',
+      });
+    try {
+      return preferenceService.save(parsed.data);
+    } catch (error) {
+      if (error instanceof ApplicationError)
+        return reply.code(404).send(publicError(error));
+      throw error;
+    }
+  });
+  app.delete<{ Params: { id: string } }>(
+    '/preferences/:id',
+    async (request, reply) => {
+      try {
+        preferenceService.delete(request.params.id);
+        return reply.code(204).send();
+      } catch (error) {
+        if (error instanceof ApplicationError)
+          return reply.code(404).send(publicError(error));
+        throw error;
+      }
+    },
+  );
   app.get('/health', async () => {
     persistence.health();
     return {
@@ -251,5 +366,5 @@ export async function buildServer(
     });
   });
   await app.ready();
-  return { app, persistence, devices };
+  return { app, persistence, devices, automations, pollAutomations };
 }

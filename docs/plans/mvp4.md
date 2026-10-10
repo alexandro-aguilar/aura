@@ -1,6 +1,6 @@
 # MVP4 plan — wake word, memory and automations
 
-Status: proposed, with three independently accepted slices. Entry requires MVP3 exit. Requirements P-09–11; preserve all earlier safety boundaries. Do not enable all slices together.
+Status: software implemented at user request, with three independently configured slices; target hardware acceptance remains open. Normal rollout entry requires MVP3 exit; the user explicitly selected MVP4 software work while prior hardware/browser acceptance remains open. Requirements P-09–11; preserve all earlier safety boundaries. Do not enable all slices together.
 
 | Task                               | Owner packages                                   | Depends on           | Deliverable and acceptance                                                                                                                                          |
 | ---------------------------------- | ------------------------------------------------ | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -19,3 +19,5 @@ Wake-word acceptance requires reliable mute behavior and no cloud upload before 
 Sensitive-action expansion is excluded. If requested later, first specify caller identity, exact operation binding, expiry, single-use confirmation, replay protection and safe failure behavior. Model-generated confirmation text alone is insufficient authorization.
 
 Exit is per slice: fixtures and failure tests pass, Pi behavior is measured, setup/recovery docs are current, and previous chat/direct/voice acceptance remains intact. Unselected slices remain proposed.
+
+Implementation contracts: [MVP4](../specs/mvp4.md). Setup: [MVP4 deployment](../deployment/mvp4.md). Evidence: [MVP4 verification](../verification/mvp4.md). T01 SDK selection and explicit user approval complete; T03/T04 memory software and T05/T06 deterministic automation software complete. T02 local wake implementation/fixtures complete; live AccessKey/Pi measurement and T07 hardware rollout remain open. Earlier browser/live speech acceptance remains open.

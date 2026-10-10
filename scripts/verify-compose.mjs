@@ -8,8 +8,8 @@ assert(
   process.argv.slice(2).every((arg) => arg === '--restart'),
   'Unknown argument',
 );
-const api = 'http://127.0.0.1:3001';
-const web = 'http://localhost:8080';
+const api = process.env.AURA_API_URL ?? 'http://127.0.0.1:3001';
+const web = process.env.AURA_WEB_URL ?? 'http://localhost:8080';
 async function request(url, options) {
   return fetch(url, { ...options, signal: AbortSignal.timeout(5000) });
 }
@@ -77,7 +77,7 @@ assert.equal(
 );
 
 const events = await new Promise((resolve, reject) => {
-  const socket = new WebSocket('ws://localhost:8080/api/chat/stream');
+  const socket = new WebSocket(`${web.replace(/^http/, 'ws')}/api/chat/stream`);
   const received = [];
   const timer = setTimeout(() => {
     socket.close();

@@ -1,4 +1,4 @@
-const CACHE = 'aura-shell-v1';
+const CACHE = 'aura-shell-v2';
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches

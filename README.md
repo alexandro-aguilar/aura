@@ -23,11 +23,11 @@ Goal: Raspberry Pi 5 home intelligence assistant using TypeScript, Strands Agent
 
 See [AGENTS.md](AGENTS.md) for implementation guardrails, [project specifications](docs/specs/README.md) for requirements and architecture, [the delivery plan](docs/implementation-plan.md) for phase order and acceptance gates, and [SDK compatibility evidence](docs/sdk-compatibility.md) for the verified API basis and outstanding runtime checks.
 
-## MVP1 and MVP2
+## MVP1 through MVP4
 
 The scaffold contains a strict TypeScript Yarn monorepo, Fastify HTTP and WebSocket chat, a React/Vite PWA shell, SQLite/Drizzle conversation storage, and an audited mock-light tool. Default mock mode is deterministic and requires no API key, Home Assistant, Raspberry Pi, microphone, or speaker.
 
-Devices are simulated by default, including when the OpenAI agent is enabled. MVP2 adds an independently configured Home Assistant backend, explicit light write grants, observed-state confirmation, durable execution audit and direct controls that require no LLM. Home Assistant is installed separately; a local test installation uses simulated template lights. MQTT, voice and sensitive actions remain later work.
+Devices are simulated by default, including when the OpenAI agent is enabled. MVP2 adds an independently configured Home Assistant backend, explicit light write grants, observed-state confirmation, durable execution audit and direct controls that require no LLM. Home Assistant is installed separately; a local test installation uses simulated template lights. MVP3 adds deliberate browser recording and a one-turn Linux voice satellite; MVP4 adds optional local Porcupine wake listening, explicitly approved preferences and deterministic light automations; all three are independently disabled by default. MQTT and sensitive actions remain later work. See [voice setup and recovery](docs/deployment/voice.md) and [MVP3 verification](docs/verification/mvp3.md).
 
 ### Local setup
 
@@ -172,6 +172,20 @@ curl -X POST http://127.0.0.1:3001/device-operations \
 Success returns `operationId`, `conversationId` and the observed `device`. An optional existing conversationId can associate the audit with a chat. Inspect `GET /conversations/:id/audit` and `GET /devices` after failure or disconnect before deciding to retry. The PWA never queues operations offline. Health checks SQLite without contacting HA or a paid provider; device listing reports separate upstream failures.
 
 Return `DEVICE_BACKEND=mock` and recreate the base stack to restore simulated controls. If using the local HA env file, run the base stack without that env file/overlay to return to defaults. Existing audits remain intact.
+
+### Deliberate voice (MVP3)
+
+The PWA now has **Talk to Aura**: Start recording → Stop and send → recognition → existing chat/tools → playback. Discard sends nothing; recording automatically stops/sends at 20 seconds. Use localhost or HTTPS for microphone access. Default mock speech always recognizes `status` and plays a tone, requiring no API key or Pi. Real recognition/playback uses server-only `SPEECH_MODE=openai`, independent of agent/device modes; see `.env.example` and [the voice guide](docs/deployment/voice.md).
+
+The Linux satellite uses host `alsa-utils` and Node 24. Put only its scoped SATELLITE_TOKEN and audio/API settings in private `.env.voice-satellite`, build, then run `yarn voice:once`. It captures a single deliberate turn, ends on silence, closes the microphone before playback, and exits. `yarn voice:once --fixture --no-playback` exercises transport on macOS against mock speech/agent modes. `yarn verify:voice` checks the running mock voice API and persisted text without paid requests. Setup, token generation, SSH access, supported WAV limits and recovery are documented in [the voice guide](docs/deployment/voice.md).
+
+Voice uses the same device grants and audit as typed chat. A submitted action may finish after disconnect or stopped playback: inspect conversation history/audit and device state before resubmitting. Audio stays in transient buffers; transcripts/answers persist. No audio or operations are queued offline. Actual browser/live speech and Pi/USB acceptance remain open; [MVP3 evidence](docs/verification/mvp3.md) distinguishes fixtures and ARM64 container checks from hardware validation.
+
+### Advanced capabilities (MVP4)
+
+Memory and automations are implemented behind independent `MEMORY_ENABLED=false` and `AUTOMATIONS_ENABLED=false` server flags. The PWA supports approved language/style preferences with inspect/edit/delete, plus disabled-by-default light-transition rules, dry-run, explicit activation, receipts and emergency stop. Mock `show preferences` reports active memory. Automations use existing snapshots and the same grants/audit as direct controls; no MQTT or LLM rule activation is needed.
+
+The optional Linux wake CLI is `yarn voice:wake`. It needs `WAKE_ENABLED=true` and your own `PICOVOICE_ACCESS_KEY` in private `.env.voice-satellite`; starts muted; uses `u`/`m`/`q` plus Enter; and defaults to the keyword **Porcupine**. No AccessKey is needed for fixture tests. Enable and accept one capability at a time. See [MVP4 setup/recovery](docs/deployment/mvp4.md), [contracts](docs/specs/mvp4.md) and [verification](docs/verification/mvp4.md). Pi wake accuracy/echo and existing browser/live speech acceptance remain open.
 
 ### Docker Compose (ARM64)
 

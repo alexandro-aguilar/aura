@@ -6,6 +6,7 @@ import type {
   LightOperation,
   OperationPolicy,
   Runtime,
+  PreferenceRepository,
 } from '@aura/domain';
 import { DeviceGatewayError } from '@aura/domain';
 import {
@@ -188,6 +189,7 @@ export class ChatService {
     private readonly conversations: ConversationRepository,
     private readonly agent: ChatAgent,
     private readonly runtime: Runtime,
+    private readonly preferences?: PreferenceRepository,
   ) {}
   async *stream(untrusted: unknown): AsyncGenerator<ChatEvent> {
     const input = chatRequestSchema.parse(untrusted);
@@ -222,6 +224,7 @@ export class ChatService {
         conversationId,
         message: input.message,
         history,
+        ...(this.preferences ? { preferences: this.preferences.list() } : {}),
       })) {
         message += text;
         yield { type: 'delta', text };
@@ -244,3 +247,9 @@ export class ChatService {
     }
   }
 }
+
+export { VoiceService } from './voice.js';
+
+export { PreferenceService } from './preferences.js';
+
+export { AutomationService } from './automations.js';

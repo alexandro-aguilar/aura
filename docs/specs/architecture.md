@@ -12,7 +12,7 @@
 | persistence     | SQLite/Drizzle repositories and migrations                             | domain                                 |
 | api             | Fastify HTTP/WS, configuration and composition root                    | All server packages and contracts      |
 | web             | React/Vite PWA                                                         | contracts only                         |
-| voice-satellite | Future audio transport and playback                                    | contracts only; currently placeholder  |
+| voice-satellite | Deliberate ALSA capture, transport and playback                        | contracts only                         |
 
 Use public compiled exports and dependency injection. The API supplies repositories, adapter selection, clocks, UUID generation, credentials and policy grants. Agent callbacks close over server conversation context; device operations accept neither conversation identity nor permission grants from the model. Verify these rules with `yarn check:boundaries`.
 
@@ -24,7 +24,7 @@ Use public compiled exports and dependency injection. The API supplies repositor
 4. DeviceTools validates operation arguments, authorizes the device, records pending, invokes the gateway and records the outcome. Valid but denied requests are audited as denied without gateway execution.
 5. ChatService persists the complete assistant response before emitting done, then releases its guard even on failure.
 
-An origin check protects browser requests but does not establish user identity. Requests without an Origin header are currently accepted. MVP1 is a trusted, single-user, loopback service; do not treat origin checks as authorization for a broader network deployment.
+An origin check protects browser requests but does not establish user identity. Chat/direct requests without an Origin header are accepted in the trusted loopback model; MVP3 voice uploads additionally require a scoped satellite bearer token when Origin is absent. MVP1 is a trusted, single-user, loopback service; do not treat origin checks as authorization for a broader network deployment.
 
 A single API process owns SQLite and the in-memory conversation guard. Multiple replicas, cross-process locking, durable request queues and exactly-once execution are not supported. Do not add them implicitly.
 
@@ -55,3 +55,7 @@ Before each SDK integration, inspect current official documentation and package 
 Home Assistant credentials stay in a server adapter. Entity grants and direct-control requests pass through the same application policy and audit path as agent tools. Connection status and state freshness must remain distinct from provider availability.
 
 Audio input is untrusted and subject to bounded size, duration and format validation. Voice clients transport audio and play output; the API owns STT/TTS credentials and all operations. Memory and event text are untrusted context, never new authorization. Confirmation must bind an exact operation to a trusted caller, expiry and single-use approval before any sensitive capability is enabled.
+
+## Voice flow (MVP3)
+
+Canonical bounded WAV enters POST /voice/turn, using the configured browser origin or a scoped satellite token. VoiceService invokes SpeechToText, validates the transcript, drains the same ChatService, then invokes TextToSpeech only after the answer is persisted. The API streams NDJSON phases/text and bounded WAV audio; clients never retry automatically. Speech ports/errors live in domain, provider adapters in integrations and orchestration in application. Browser AudioWorklet and satellite ALSA clients import only contracts; provider keys remain in the API. Disconnect before recognition prevents chat; disconnect after chat acceptance finishes persistence/audit without undoing device actions. See [MVP3](mvp3.md) for limits and acceptance.

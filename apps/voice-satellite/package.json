@@ -11,6 +11,11 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "node --env-file-if-exists=../../.env.voice-satellite dist/main.js"
+  },
+  "dependencies": {
+    "@aura/contracts": "workspace:*",
+    "@picovoice/porcupine-node": "4.0.2"
   }
 }

@@ -70,3 +70,60 @@ describe('device backend configuration', () => {
     ).toMatchObject({ writeLightIds: ['light.office'] });
   });
 });
+
+describe('speech configuration', () => {
+  it('keeps speech mode independent from the agent and defaults to safe fixtures', () => {
+    expect(
+      readConfig({ AGENT_MODE: 'openai', OPENAI_API_KEY: 'fixture' }).speech
+        .mode,
+    ).toBe('mock');
+    expect(
+      readConfig({ SPEECH_MODE: 'openai', OPENAI_API_KEY: 'fixture' }).mode,
+    ).toBe('mock');
+    expect(readConfig({}).speech).toMatchObject({
+      language: 'en',
+      voice: 'coral',
+      satelliteToken: '',
+    });
+  });
+  it.each([
+    { SPEECH_MODE: 'other' },
+    { SPEECH_MODE: 'openai' },
+    { SPEECH_TIMEOUT_MS: '0' },
+    { SPEECH_TIMEOUT_MS: '60001' },
+    { SPEECH_TIMEOUT_MS: 'NaN' },
+    { SPEECH_LANGUAGE: 'english' },
+    { SPEECH_VOICE: 'unknown' },
+    { SATELLITE_TOKEN: 'short' },
+    { SATELLITE_TOKEN: 'x'.repeat(32) + '\n' },
+    { SPEECH_TTS_MODEL: '' },
+  ])('rejects invalid configuration: %j', (env) => {
+    expect(() => readConfig(env)).toThrow();
+  });
+});
+
+describe('independent MVP4 switches', () => {
+  it('defaults to disabled memory and automations', () => {
+    expect(readConfig({})).toMatchObject({
+      memoryEnabled: false,
+      automationsEnabled: false,
+      automationPollMs: 5000,
+    });
+    expect(readConfig({ MEMORY_ENABLED: 'true' })).toMatchObject({
+      memoryEnabled: true,
+      automationsEnabled: false,
+    });
+    expect(readConfig({ AUTOMATIONS_ENABLED: 'true' })).toMatchObject({
+      memoryEnabled: false,
+      automationsEnabled: true,
+    });
+  });
+  it.each([
+    { MEMORY_ENABLED: 'yes' },
+    { AUTOMATIONS_ENABLED: 'yes' },
+    { AUTOMATION_POLL_MS: '999' },
+    { AUTOMATION_POLL_MS: '60001' },
+  ])('rejects invalid MVP4 settings: %j', (env) =>
+    expect(() => readConfig(env)).toThrow(),
+  );
+});

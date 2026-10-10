@@ -59,3 +59,9 @@ export const auditEntrySchema = z.object({
   createdAt: z.iso.datetime(),
 });
 export const auditListSchema = z.array(auditEntrySchema);
+
+export * from './voice.js';
+
+export * from './preferences.js';
+
+export * from './automations.js';

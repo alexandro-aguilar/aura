@@ -1,4 +1,4 @@
-import type { ChatAgent, Message } from '@aura/domain';
+import type { ChatAgent, Message, ApprovedPreference } from '@aura/domain';
 import type { DeviceTools } from '@aura/application';
 
 // Deterministic local fixture, intentionally limited to documented commands.
@@ -11,13 +11,20 @@ export class MockChatAgent implements ChatAgent {
     conversationId: string;
     message: string;
     history: Message[];
+    preferences?: ApprovedPreference[];
   }) {
     const command =
       /^turn (on|off) (light\.[a-z0-9_]+|living room|bedroom)(?: light)?[.!]?$/i.exec(
         input.message,
       );
     let response: string;
-    if (command && this.options.readOnly) {
+    if (/^show preferences[.!]?$/i.test(input.message)) {
+      response = input.preferences?.length
+        ? input.preferences
+            .map((entry) => `${entry.category}: ${entry.value}`)
+            .join('; ')
+        : 'No approved preferences are active.';
+    } else if (command && this.options.readOnly) {
       response =
         'Home Assistant lights are read-only. Try "list devices" or "status".';
     } else if (command) {

@@ -9,6 +9,15 @@ export type DeviceBackend =
       timeoutMs: number;
       confirmationTimeoutMs: number;
     };
+export interface SpeechConfig {
+  mode: 'mock' | 'openai';
+  transcriptionModel: string;
+  speechModel: string;
+  voice: string;
+  language: string;
+  timeoutMs: number;
+  satelliteToken: string;
+}
 export interface Config {
   mode: 'mock' | 'openai';
   databasePath: string;
@@ -18,8 +27,25 @@ export interface Config {
   apiKey: string;
   model: string;
   deviceBackend: DeviceBackend;
+  speech: SpeechConfig;
+  memoryEnabled: boolean;
+  automationsEnabled: boolean;
+  automationPollMs: number;
 }
 export function readConfig(env: NodeJS.ProcessEnv = process.env): Config {
+  const automationFlag = env.AUTOMATIONS_ENABLED ?? 'false';
+  if (!['true', 'false'].includes(automationFlag))
+    throw new Error('AUTOMATIONS_ENABLED must be true or false');
+  const automationPollMs = Number(env.AUTOMATION_POLL_MS ?? 5000);
+  if (
+    !Number.isInteger(automationPollMs) ||
+    automationPollMs < 1000 ||
+    automationPollMs > 60000
+  )
+    throw new Error('AUTOMATION_POLL_MS must be 1000–60000');
+  const memoryEnabled = env.MEMORY_ENABLED ?? 'false';
+  if (!['true', 'false'].includes(memoryEnabled))
+    throw new Error('MEMORY_ENABLED must be true or false');
   const mode = env.AGENT_MODE ?? 'mock';
   if (mode !== 'mock' && mode !== 'openai')
     throw new Error('AGENT_MODE must be mock or openai');
@@ -29,6 +55,57 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const apiKey = env.OPENAI_API_KEY ?? '';
   if (mode === 'openai' && !apiKey.trim())
     throw new Error('OPENAI_API_KEY is required in openai mode');
+  const speechMode = env.SPEECH_MODE ?? 'mock';
+  if (speechMode !== 'mock' && speechMode !== 'openai')
+    throw new Error('SPEECH_MODE must be mock or openai');
+  if (speechMode === 'openai' && !apiKey.trim())
+    throw new Error('OPENAI_API_KEY is required for OpenAI speech');
+  const speechTimeout = Number(env.SPEECH_TIMEOUT_MS ?? 30000);
+  if (
+    !Number.isInteger(speechTimeout) ||
+    speechTimeout < 100 ||
+    speechTimeout > 60000
+  )
+    throw new Error('SPEECH_TIMEOUT_MS must be 100–60000');
+  const language = env.SPEECH_LANGUAGE ?? 'en';
+  if (!/^[a-z]{2}$/.test(language))
+    throw new Error('SPEECH_LANGUAGE must be a two-letter language code');
+  const voice = env.SPEECH_VOICE ?? 'coral';
+  if (
+    ![
+      'alloy',
+      'ash',
+      'ballad',
+      'coral',
+      'echo',
+      'fable',
+      'onyx',
+      'nova',
+      'sage',
+      'shimmer',
+      'verse',
+      'marin',
+      'cedar',
+    ].includes(voice)
+  )
+    throw new Error('Unsupported SPEECH_VOICE');
+  const satelliteToken = env.SATELLITE_TOKEN ?? '';
+  if (satelliteToken && !/^[A-Za-z0-9_-]{32,128}$/.test(satelliteToken))
+    throw new Error(
+      'SATELLITE_TOKEN must contain 32–128 URL-safe random characters',
+    );
+  const speech: SpeechConfig = {
+    mode: speechMode,
+    transcriptionModel:
+      env.SPEECH_TRANSCRIPTION_MODEL ?? 'gpt-4o-mini-transcribe-2025-12-15',
+    speechModel: env.SPEECH_TTS_MODEL ?? 'gpt-4o-mini-tts-2025-12-15',
+    voice,
+    language,
+    timeoutMs: speechTimeout,
+    satelliteToken,
+  };
+  if (!speech.transcriptionModel.trim() || !speech.speechModel.trim())
+    throw new Error('Speech model IDs cannot be empty');
   const backend = env.DEVICE_BACKEND ?? 'mock';
   let deviceBackend: DeviceBackend;
   if (backend === 'mock') {
@@ -108,5 +185,9 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env): Config {
     webOrigin: env.WEB_ORIGIN ?? 'http://localhost:5173',
     model: env.OPENAI_MODEL ?? 'gpt-5.4',
     deviceBackend,
+    speech,
+    memoryEnabled: memoryEnabled === 'true',
+    automationsEnabled: automationFlag === 'true',
+    automationPollMs,
   };
 }

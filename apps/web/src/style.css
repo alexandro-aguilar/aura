@@ -118,3 +118,61 @@ button:disabled {
 .light-controls button {
   padding: 0.5rem 1rem;
 }
+
+.voice-panel {
+  margin: 1.5rem 0;
+  padding: 1.25rem;
+  border: 1px solid #b0c0b1;
+  border-radius: 1rem;
+  background: #eaf0e6;
+}
+.voice-panel h2 {
+  margin-top: 0;
+}
+.voice-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+.voice-inspection {
+  overflow-wrap: anywhere;
+  font-size: 0.85rem;
+}
+.voice-panel small {
+  display: block;
+  line-height: 1.5;
+}
+
+.settings-panel {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #526578;
+  border-radius: 0.7rem;
+}
+.settings-panel form {
+  display: grid;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+.settings-panel select,
+.settings-panel input:not([type='checkbox']) {
+  padding: 0.5rem;
+  font: inherit;
+  max-width: 100%;
+}
+.settings-panel small {
+  display: block;
+  margin: 0.4rem 0;
+}
+.settings-panel li {
+  margin-bottom: 1rem;
+  overflow-wrap: anywhere;
+}
+.settings-panel button {
+  margin: 0.3rem;
+}
+.settings-panel .consent {
+  display: block;
+  margin: 1rem 0;
+}

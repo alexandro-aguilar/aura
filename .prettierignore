@@ -6,3 +6,5 @@ data
 AGENTS.md
 
 .env.home-assistant.local*
+
+.env.voice-satellite

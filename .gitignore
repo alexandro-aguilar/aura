@@ -8,3 +8,5 @@ coverage/
 .DS_Store
 
 .env.home-assistant.local*
+
+.env.voice-satellite

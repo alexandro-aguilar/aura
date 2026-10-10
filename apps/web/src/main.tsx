@@ -10,6 +10,9 @@ import {
 } from '@aura/contracts';
 import type { Device } from '@aura/contracts';
 import './style.css';
+import { AutomationsPanel } from './AutomationsPanel.js';
+import { PreferencesPanel } from './PreferencesPanel.js';
+import { VoicePanel } from './VoicePanel.js';
 
 interface Line {
   role: 'user' | 'assistant';
@@ -20,6 +23,7 @@ function App() {
   const [lines, setLines] = useState<Line[]>([]);
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
+  const [voiceBusy, setVoiceBusy] = useState(false);
   const [status, setStatus] = useState('Connecting…');
   const [error, setError] = useState('');
   const [mode, setMode] = useState('');
@@ -174,6 +178,7 @@ function App() {
     if (
       !message.trim() ||
       busy ||
+      voiceBusy ||
       socket.current?.readyState !== WebSocket.OPEN
     )
       return;
@@ -309,6 +314,20 @@ function App() {
           {error}
         </p>
       )}
+      <PreferencesPanel />
+      <AutomationsPanel />
+      <VoicePanel
+        disabled={busy || voiceBusy}
+        conversationId={() => conversationId.current}
+        onConversation={(id) => {
+          conversationId.current = id;
+        }}
+        onLine={(role, content) =>
+          setLines((current) => [...current, { role, content }])
+        }
+        onBusy={setVoiceBusy}
+        onComplete={() => void refreshDevices()}
+      />
       <form onSubmit={submit}>
         <label htmlFor="message">Message Aura</label>
         <div className="composer">
@@ -322,9 +341,13 @@ function App() {
                 ? 'List devices'
                 : 'Turn on living room'
             }
-            disabled={busy}
+            disabled={busy || voiceBusy}
           />
-          <button disabled={busy || !message.trim() || status !== 'Connected'}>
+          <button
+            disabled={
+              busy || voiceBusy || !message.trim() || status !== 'Connected'
+            }
+          >
             Send
           </button>
         </div>

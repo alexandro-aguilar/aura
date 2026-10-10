@@ -29,3 +29,7 @@ export class MockDeviceGateway implements DeviceGateway {
     return { ...updated };
   }
 }
+
+export { MockSpeech, OpenAISpeech } from './speech.js';
+
+export { DeviceStatePoller } from './device-events.js';

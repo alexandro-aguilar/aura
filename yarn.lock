@@ -86,6 +86,9 @@ __metadata:
 "@aura/voice-satellite@workspace:apps/voice-satellite":
   version: 0.0.0-use.local
   resolution: "@aura/voice-satellite@workspace:apps/voice-satellite"
+  dependencies:
+    "@aura/contracts": "workspace:*"
+    "@picovoice/porcupine-node": "npm:4.0.2"
   languageName: unknown
   linkType: soft
 
@@ -863,6 +866,14 @@ __metadata:
   version: 0.153.0
   resolution: "@oxc-project/types@npm:0.153.0"
   checksum: 10c0/32011227bc4f0e6536c07ef79ce9254e5a453cdbfdb51b6717d0edc06b7d85a9a2a8ca12102de3b71f91a0e78d4facb538d17b28e6a7b6527ffc8901d8cd82c6
+  languageName: node
+  linkType: hard
+
+"@picovoice/porcupine-node@npm:4.0.2":
+  version: 4.0.2
+  resolution: "@picovoice/porcupine-node@npm:4.0.2"
+  checksum: 10c0/0c5751efa89a6368ffcfcf9f91851bbe32f95de195c23a9e074bacfba1bf5f835896002c6ddd24e915ffc99cca7671008dcad994d37b064c2b9a8f1614a6cf2a
+  conditions: (!cpu=ia32 | !cpu=mips | !cpu=ppc | !cpu=ppc64)
   languageName: node
   linkType: hard
 

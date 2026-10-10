@@ -28,7 +28,11 @@
     "deploy:ha:local": "docker compose --env-file .env.home-assistant.local -f compose.yaml -f compose.home-assistant.yaml up --build -d --wait",
     "verify:ha:local": "node --env-file=.env.home-assistant.local scripts/verify-local-ha.mjs",
     "dev:api:ha:local": "HA_URL=http://127.0.0.1:8123 tsx watch --env-file=.env.home-assistant.local apps/api/src/main.ts",
-    "verify:openai:local": "node --env-file=.env.home-assistant.local scripts/verify-openai-local.mjs"
+    "verify:openai:local": "node --env-file=.env.home-assistant.local scripts/verify-openai-local.mjs",
+    "voice:once": "node --env-file-if-exists=.env.voice-satellite apps/voice-satellite/dist/main.js --once",
+    "verify:voice": "node scripts/verify-voice.mjs",
+    "voice:wake": "node --env-file-if-exists=.env.voice-satellite apps/voice-satellite/dist/wake-main.js",
+    "verify:mvp4": "node scripts/verify-mvp4.mjs"
   },
   "devDependencies": {
     "@types/node": "24.10.15",
