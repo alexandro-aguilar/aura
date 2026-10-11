@@ -1,0 +1,124 @@
+/* Brief, interruptible feedback. Never animate layout or focus. */
+@layer components {
+  .nav-indicator {
+    transition:
+      transform var(--aura-duration-enter) var(--aura-ease),
+      width var(--aura-duration-enter) var(--aura-ease),
+      height var(--aura-duration-enter) var(--aura-ease);
+  }
+
+  @keyframes aura-enter {
+    from {
+      opacity: 0.6;
+      transform: translateY(var(--aura-motion-distance));
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes aura-activity {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Main content enters with the same motion and timing as the page title. */
+  /* Animate glass surfaces directly: ancestor opacity would isolate their backdrop. */
+  .aura-app > :is(.devices, .dashboard-chat):not([hidden]),
+  .dashboard-voice:not([hidden]) > .voice-panel,
+  .dashboard-settings:not([hidden]) > .settings-panel {
+    animation: aura-enter var(--aura-duration-enter) var(--aura-ease);
+  }
+
+  .aura-app > header :is(h1, .page-description),
+  .device-card,
+  .conversation > article:last-of-type {
+    animation: aura-enter var(--aura-duration-enter) var(--aura-ease);
+  }
+
+  /* Only a small opening stagger; large device lists never accumulate delays. */
+  .device-card:nth-child(2) {
+    animation-delay: var(--aura-delay-step);
+  }
+  .device-card:nth-child(3) {
+    animation-delay: calc(2 * var(--aura-delay-step));
+  }
+  .device-card:nth-child(n + 4) {
+    animation-delay: calc(3 * var(--aura-delay-step));
+  }
+
+  .device-card {
+    animation-fill-mode: backwards;
+    transition:
+      border-color var(--aura-duration-normal) var(--aura-ease),
+      background-color var(--aura-duration-normal) var(--aura-ease);
+  }
+  .device-card[data-state='on'] {
+    border-color: var(--aura-glass-edge);
+  }
+  .device-state {
+    transition: color var(--aura-duration-fast) var(--aura-ease);
+  }
+
+  .dashboard-nav a,
+  :where(.composer, .devices, .voice-panel, .settings-panel) button {
+    transition:
+      transform var(--aura-duration-fast) var(--aura-ease),
+      background-color var(--aura-duration-fast) var(--aura-ease),
+      border-color var(--aura-duration-fast) var(--aura-ease),
+      color var(--aura-duration-fast) var(--aura-ease);
+  }
+  .dashboard-nav a:active,
+  :where(.composer, .devices, .voice-panel, .settings-panel)
+    button:enabled:active {
+    transform: scale(var(--aura-scale-pressed));
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .dashboard-nav a:hover,
+    :where(.composer, .devices, .voice-panel, .settings-panel)
+      button:enabled:hover {
+      transform: translateY(-1px);
+    }
+    .dashboard-nav a:active,
+    :where(.composer, .devices, .voice-panel, .settings-panel)
+      button:enabled:active {
+      transform: scale(var(--aura-scale-pressed));
+    }
+  }
+
+  /* Indicators follow existing pending states; labels remain the source of truth. */
+  .chat-progress::before,
+  .devices[data-busy='true'] .device-heading h2::after,
+  .settings-panel[data-busy='true'] > h2::after {
+    content: '';
+    display: inline-block;
+    width: 0.75em;
+    height: 0.75em;
+    margin-inline: var(--aura-space-2);
+    border: 2px solid var(--aura-border-control);
+    border-top-color: var(--aura-accent);
+    border-radius: var(--aura-radius-pill);
+    animation: aura-activity var(--aura-duration-activity) linear infinite;
+  }
+  .voice-panel:is(
+      [data-phase='permission'],
+      [data-phase='transcribing'],
+      [data-phase='responding'],
+      [data-phase='synthesizing']
+    )
+    .voice-phase::before {
+    border-top-color: transparent;
+    animation: aura-activity var(--aura-duration-activity) linear infinite;
+  }
+}
+
+@layer accessibility {
+  @media (prefers-reduced-motion: reduce) {
+    .dashboard-nav a,
+    :where(.composer, .devices, .voice-panel, .settings-panel) button {
+      transform: none;
+    }
+  }
+}

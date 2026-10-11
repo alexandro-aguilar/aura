@@ -8,6 +8,8 @@ import type {
   ConversationRepository,
   DeviceGateway,
   Message,
+  PreferenceRepository,
+  ApprovedPreference,
 } from '@aura/domain';
 import { ChatService, DeviceTools, MockLightPolicy } from './index.js';
 import { DeviceGatewayError } from '@aura/domain';
@@ -44,6 +46,52 @@ async function collect<T>(stream: AsyncIterable<T>) {
   for await (const item of stream) result.push(item);
   return result;
 }
+
+it.each([true, false])(
+  'snapshots memory at turn start when initially enabled=%s',
+  async (initial) => {
+    const storage = memory();
+    let enabled = initial;
+    const preference: ApprovedPreference = {
+      id: randomUUID(),
+      category: 'response_language',
+      value: 'es',
+      source: 'operator',
+      approvedAt: runtime.now(),
+      sourceConversationId: null,
+    };
+    const repository: PreferenceRepository = {
+      enabled: () => enabled,
+      setEnabled: (next) => {
+        enabled = next;
+      },
+      list: () => [preference],
+      save: () => {},
+      delete: () => false,
+    };
+    const captured: (ApprovedPreference[] | undefined)[] = [];
+    const agent: ChatAgent = {
+      stream: async function* (input) {
+        captured.push(input.preferences);
+        yield 'ok';
+      },
+    };
+    const service = new ChatService(
+      storage.repository,
+      agent,
+      runtime,
+      repository,
+    );
+    const stream = service.stream({ message: 'first' });
+    expect((await stream.next()).value).toMatchObject({ type: 'started' });
+    repository.setEnabled(!initial);
+    await collect(stream);
+    await collect(service.stream({ message: 'second' }));
+    expect(captured).toEqual(
+      initial ? [[preference], undefined] : [undefined, [preference]],
+    );
+  },
+);
 
 describe('device operation boundary', () => {
   function setup() {

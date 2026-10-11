@@ -3,7 +3,7 @@ import type {
   PreferenceRepository,
   Runtime,
 } from '@aura/domain';
-import { preferenceRequestSchema } from '@aura/contracts';
+import { preferenceRequestSchema, memoryControlSchema } from '@aura/contracts';
 import { ApplicationError } from './index.js';
 
 export class PreferenceService {
@@ -14,6 +14,14 @@ export class PreferenceService {
   ) {}
   list() {
     return this.repository.list();
+  }
+  enabled() {
+    return this.repository.enabled();
+  }
+  control(untrusted: unknown) {
+    const input = memoryControlSchema.parse(untrusted);
+    this.repository.setEnabled(input.enabled);
+    return { enabled: this.repository.enabled() };
   }
   save(untrusted: unknown) {
     const input = preferenceRequestSchema.parse(untrusted);

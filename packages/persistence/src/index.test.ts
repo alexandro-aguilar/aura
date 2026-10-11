@@ -132,7 +132,7 @@ describe('SQLite repositories', () => {
       ).toEqual([auditId, secondId]);
       const inspection = new Database(filename, { readonly: true });
       try {
-        expect(inspection.pragma('user_version', { simple: true })).toBe(4);
+        expect(inspection.pragma('user_version', { simple: true })).toBe(5);
         expect(inspection.pragma('foreign_key_check')).toEqual([]);
         expect(inspection.pragma('integrity_check')).toEqual([
           { integrity_check: 'ok' },
@@ -147,44 +147,51 @@ describe('SQLite repositories', () => {
   });
 });
 
-it('migrates v3 approved preferences to v4 without changing provenance', () => {
-  const directory = mkdtempSync(join(tmpdir(), 'aura-preference-upgrade-'));
-  const filename = join(directory, 'aura.sqlite');
-  const initial = new Database(filename);
-  const id = randomUUID();
-  for (const migration of [
-    '0001_initial.sql',
-    '0002_uncertain_audit.sql',
-    '0003_preferences.sql',
-  ])
-    initial.exec(
-      readFileSync(
-        new URL(`../migrations/${migration}`, import.meta.url),
-        'utf8',
-      ),
-    );
-  initial
-    .prepare(
-      'INSERT INTO approved_preferences (id, category, value, approved_at, source) VALUES (?, ?, ?, ?, ?)',
-    )
-    .run(id, 'response_language', 'es', '2026-10-10T00:00:00Z', 'operator');
-  initial.pragma('user_version = 3');
-  initial.close();
-  const storage = openPersistence(filename);
-  try {
-    expect(storage.preferences.list()).toEqual([
-      {
-        id,
-        category: 'response_language',
-        value: 'es',
-        approvedAt: '2026-10-10T00:00:00Z',
-        source: 'operator',
-        sourceConversationId: null,
-      },
-    ]);
-    expect(storage.automations.enabled()).toBe(false);
-  } finally {
-    storage.close();
-    rmSync(directory, { recursive: true, force: true });
-  }
-});
+it.each([3, 4])(
+  'migrates v%s preferences to the latest schema without changing provenance or automation state',
+  (version) => {
+    const directory = mkdtempSync(join(tmpdir(), 'aura-preference-upgrade-'));
+    const filename = join(directory, 'aura.sqlite');
+    const initial = new Database(filename);
+    const id = randomUUID();
+    for (const migration of [
+      '0001_initial.sql',
+      '0002_uncertain_audit.sql',
+      '0003_preferences.sql',
+      '0004_automations.sql',
+    ].slice(0, version))
+      initial.exec(
+        readFileSync(
+          new URL(`../migrations/${migration}`, import.meta.url),
+          'utf8',
+        ),
+      );
+    initial
+      .prepare(
+        'INSERT INTO approved_preferences (id, category, value, approved_at, source) VALUES (?, ?, ?, ?, ?)',
+      )
+      .run(id, 'response_language', 'es', '2026-10-10T00:00:00Z', 'operator');
+    if (version === 4)
+      initial.exec('UPDATE automation_control SET enabled = 1 WHERE id = 1');
+    initial.pragma(`user_version = ${version}`);
+    initial.close();
+    const storage = openPersistence(filename);
+    try {
+      expect(storage.preferences.list()).toEqual([
+        {
+          id,
+          category: 'response_language',
+          value: 'es',
+          approvedAt: '2026-10-10T00:00:00Z',
+          source: 'operator',
+          sourceConversationId: null,
+        },
+      ]);
+      expect(storage.automations.enabled()).toBe(version === 4);
+      expect(storage.preferences.enabled()).toBe(false);
+    } finally {
+      storage.close();
+      rmSync(directory, { recursive: true, force: true });
+    }
+  },
+);

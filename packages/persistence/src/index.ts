@@ -15,6 +15,7 @@ import {
   conversations,
   messages,
   preferences,
+  memoryControl,
   automationRules,
   automationControl,
   automationEvents,
@@ -43,6 +44,7 @@ export function openPersistence(filename: string): Persistence {
     '0002_uncertain_audit.sql',
     '0003_preferences.sql',
     '0004_automations.sql',
+    '0005_memory_control.sql',
   ];
   try {
     if (
@@ -244,6 +246,15 @@ export function openPersistence(filename: string): Persistence {
     audit: auditRepository,
     automations: automationRepository,
     preferences: {
+      enabled: () =>
+        db.select().from(memoryControl).where(eq(memoryControl.id, 1)).get()
+          ?.enabled === true,
+      setEnabled: (enabled) => {
+        db.update(memoryControl)
+          .set({ enabled })
+          .where(eq(memoryControl.id, 1))
+          .run();
+      },
       list: () =>
         db.select().from(preferences).orderBy(asc(preferences.category)).all(),
       save: (preference) => {

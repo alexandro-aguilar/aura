@@ -218,13 +218,16 @@ export class ChatService {
         content: input.message,
         createdAt: this.runtime.now(),
       });
+      const preferences = this.preferences?.enabled()
+        ? this.preferences.list()
+        : undefined;
       yield { type: 'started', conversationId };
       let message = '';
       for await (const text of this.agent.stream({
         conversationId,
         message: input.message,
         history,
-        ...(this.preferences ? { preferences: this.preferences.list() } : {}),
+        ...(preferences ? { preferences } : {}),
       })) {
         message += text;
         yield { type: 'delta', text };

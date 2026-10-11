@@ -103,6 +103,8 @@ export interface ApprovedPreference {
   sourceConversationId: string | null;
 }
 export interface PreferenceRepository {
+  enabled(): boolean;
+  setEnabled(enabled: boolean): void;
   list(): ApprovedPreference[];
   save(preference: ApprovedPreference): void;
   delete(id: string): boolean;

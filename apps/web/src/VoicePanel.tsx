@@ -4,6 +4,7 @@ import { startRecording } from './voice-capture.js';
 import type { VoiceRecording } from './voice-capture.js';
 
 export function VoicePanel(props: {
+  visible: boolean;
   disabled: boolean;
   conversationId(): string | undefined;
   onConversation(id: string): void;
@@ -23,6 +24,8 @@ export function VoicePanel(props: {
   const active = useRef(false);
   const finishRef = useRef<() => Promise<void>>(async () => {});
   const mounted = useRef(true);
+  const visible = useRef(props.visible);
+  visible.current = props.visible;
   function clearAudio() {
     if (audio.current) {
       audio.current.pause();
@@ -38,6 +41,16 @@ export function VoicePanel(props: {
     active.current = false;
     props.onBusy(false);
   }
+  useEffect(() => {
+    if (props.visible) return;
+    if (recording.current || phase === 'permission') discard();
+    if (phase === 'playback') {
+      clearAudio();
+      setPhase('idle');
+      settle();
+    }
+    // Submitted turns finish; only unsent capture and playback stop on leaving.
+  }, [props.visible]);
   useEffect(() => {
     mounted.current = true;
     const request = new AbortController();
@@ -130,7 +143,13 @@ export function VoicePanel(props: {
         throw new Error(
           'No reply audio received. Inspect history before retrying.',
         );
-      await play();
+      if (visible.current) {
+        await play();
+      } else {
+        setReplay(true);
+        setPhase('idle');
+        settle();
+      }
     } catch (failure) {
       if (!mounted.current) return;
       setError(failure instanceof Error ? failure.message : 'Voice failed.');
@@ -273,7 +292,8 @@ export function VoicePanel(props: {
       )}
       <small>
         Discard sends nothing. Stop playback only stops the speaker. Submitted
-        actions may complete after disconnection; recordings are never queued or
+        actions may complete after disconnection. Leaving Voice discards an
+        unsent recording or stops playback. Recordings are never queued or
         automatically retried.
       </small>
     </aside>

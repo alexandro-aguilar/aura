@@ -35,15 +35,17 @@ assert.deepEqual(await get('/health'), {
 const initial = await get('/automations');
 const memory = await get('/preferences');
 assert(
-  initial.available && memory.enabled,
-  'Enable only the isolated mock test stack’s memory and automation flags.',
+  initial.available,
+  'Enable the isolated mock test stack’s automation server flag.',
 );
 assert(
   !initial.enabled &&
+    !memory.enabled &&
     initial.rules.length === 0 &&
     memory.preferences.length === 0,
   'Use an empty disposable database; existing rules/preferences will not be changed.',
 );
+await request('/preferences/control', { enabled: true, consent: true });
 const saved = await request('/preferences', {
   category: 'response_language',
   value: 'es',
@@ -124,7 +126,10 @@ async function restartApi() {
 }
 if (restart) {
   await restartApi();
-  assert.deepEqual((await get('/preferences')).preferences, [saved]);
+  assert.deepEqual(await get('/preferences'), {
+    enabled: true,
+    preferences: [saved],
+  });
   const restored = await get('/automations');
   assert.equal(restored.enabled, false);
   assert.equal(restored.rules[0].enabled, true);
@@ -132,8 +137,12 @@ if (restart) {
 }
 await request(`/preferences/${saved.id}`, undefined, 'DELETE');
 await request(`/automations/${rule.id}`, undefined, 'DELETE');
+await request('/preferences/control', { enabled: false });
 if (restart) await restartApi();
-assert.deepEqual((await get('/preferences')).preferences, []);
+assert.deepEqual(await get('/preferences'), {
+  enabled: false,
+  preferences: [],
+});
 assert.doesNotMatch(
   (await request('/chat', { message: 'show preferences' })).message,
   /response_language: es/,

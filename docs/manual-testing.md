@@ -46,7 +46,6 @@ This is a procedure to run yourself, not a report of completed tests. Record you
    HOST=127.0.0.1
    PORT=3001
    WEB_ORIGIN=http://localhost:5173
-   MEMORY_ENABLED=false
    AUTOMATIONS_ENABLED=false
    ```
 
@@ -144,8 +143,8 @@ If playback fails after a response, inspect history, audit, and light state befo
 
 ## 6. Save, change, and delete a preference
 
-1. In `.env`, change `MEMORY_ENABLED=false` to `MEMORY_ENABLED=true`.
-2. Stop Terminal A with **Ctrl-C**, run `yarn dev:api` again, then reload the browser page.
+1. Open **Settings → Approved preferences**. Memory starts off; **Enable memory** stays disabled until you approve using saved preferences.
+2. Tick **I approve using saved preferences in new chat and voice turns.** and click **Enable memory**. Expected: the status updates immediately and **Disable memory** appears, without restarting the API.
 3. In **Approved preferences**, select **Response language** and **Spanish**.
 4. Confirm **Save approved preference** is disabled until you tick **I approve saving this preference until I delete it.**
 5. Tick that box and click **Save approved preference**. Expected: the saved value `es` appears with an approval timestamp.
@@ -154,7 +153,7 @@ If playback fails after a response, inspect history, audit, and light state befo
 8. Restart the API and reload the page. Expected: the saved preference remains.
 9. Click **Delete language**, then send `show preferences` again. Expected: that preference is absent from active memory.
 
-You can repeat using **Response style** with **Concise** or **Detailed**. Return `MEMORY_ENABLED=false` and restart when finished if you want the initial defaults.
+You can repeat using **Response style** with **Concise** or **Detailed**. Click **Disable memory** when finished to stop applying preferences without deleting them. Send `show preferences` to confirm no values are active, then reload/restart to check that memory remains disabled.
 
 ## 7. Create and test an automation
 
@@ -279,7 +278,7 @@ These tests make paid provider requests when you submit a turn. Keep simulated l
 4. Send “Which lights can you control?” and then “Please turn on the living room light.” Confirm the listed devices and observed state. Turn the light off afterward.
 5. To test real speech, set `SPEECH_MODE=openai` and restart/recreate again. Agent and speech modes are independent; leaving the agent in mock mode still permits real recognition of its supported commands.
 6. Record yourself saying “status”. Expected: a real transcript, a text response, and spoken reply rather than the mock tone.
-7. With `MEMORY_ENABLED=true`, save a Spanish language preference and send a new turn with the OpenAI agent. Check the answer language, then delete the test preference.
+7. With memory enabled through Settings or its API, save a Spanish language preference and send a new turn with the OpenAI agent. Check the answer language, then delete the test preference.
 8. Restore `AGENT_MODE=mock` and `SPEECH_MODE=mock` and restart/recreate when finished.
 
 Keys belong only in server configuration, never in `VITE_*` variables. Model/language/voice settings are listed in [.env.example](../.env.example). See [voice setup](deployment/voice.md) for speech configuration and recovery.

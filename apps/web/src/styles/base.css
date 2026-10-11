@@ -19,7 +19,7 @@
     margin: 0;
     min-height: 100vh;
     background:
-      linear-gradient(rgb(8 12 10 / 70%), rgb(8 12 10 / 70%)),
+      linear-gradient(rgb(14 11 6 / 70%), rgb(14 11 6 / 70%)),
       url('/images/home-interior.jpg') center / cover fixed;
   }
 

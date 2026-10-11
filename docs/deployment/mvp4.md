@@ -4,7 +4,18 @@ Build with `yarn install --immutable` and `yarn check`. Keep the existing mock d
 
 ## Memory
 
-Set `MEMORY_ENABLED=true` in server `.env`, restart API (or recreate Compose API), then use **Approved preferences**. Choose language/style, tick explicit approval and save. Saving the same category edits it. Inspect provenance and delete there. Mock `show preferences` reports active values without a provider request; real OpenAI receives fixed presentation instructions. Turn the switch off to stop injecting saved preferences without deleting them. Delete a preference to remove it from subsequent context. Review backup retention separately; earlier messages remain historical records.
+In **Settings → Approved preferences**, approve using saved preferences and click **Enable memory**. No restart is needed. Memory starts off, including after upgrading from the retired environment flag, and its API setting persists across restarts. Choose language/style, tick explicit approval and save. Saving the same category edits it. Inspect provenance and delete there. Mock `show preferences` reports active values without a provider request; real OpenAI receives fixed presentation instructions. Click **Disable memory** to stop injecting saved preferences without deleting them. Delete a preference to remove it from subsequent context. Review backup retention separately; earlier messages remain historical records.
+
+For API clients, inspect `GET /preferences`. Enable or disable with:
+
+```sh
+curl -X POST http://127.0.0.1:3001/preferences/control \
+  -H 'Content-Type: application/json' -d '{"enabled":true,"consent":true}'
+curl -X POST http://127.0.0.1:3001/preferences/control \
+  -H 'Content-Type: application/json' -d '{"enabled":false}'
+```
+
+The response reports the persisted `enabled` state. Existing in-flight agent turns keep their earlier preference snapshot; later typed/voice chat processing uses the new state. Disabling preserves saved preferences. The old `MEMORY_ENABLED` environment variable has no effect.
 
 ## Automations
 
@@ -19,7 +30,7 @@ curl -X POST http://127.0.0.1:3001/automations/control \
 
 Also set `AUTOMATIONS_ENABLED=false` and restart for a configuration-level stop. Both forms leave rules/receipts for inspection. Approved activation otherwise survives restart. Disable individual rules or delete/recreate to edit; recreated rules need fresh consent. Do not retry a pending/uncertain receipt as an event. Inspect actual device state/audit first. Snapshot polling has no event-history catchup and can miss quick transitions. The global cap is four attempts/minute; minimum rule cooldown is 60 seconds.
 
-For repeatable smoke validation, `yarn verify:mvp4 --restart` exercises only an empty disposable mock stack with both server test flags enabled. Set `AURA_API_URL` to its API origin; set `COMPOSE_PROJECT_NAME` and `COMPOSE_FILE` to that same isolated stack when using `--restart`. It refuses non-mock health or existing rules/preferences. It creates simulated light operations and historical audit receipts; it leaves global execution disabled and removes its active rule/preference. Run restart checks sequentially with other Compose/voice verification commands.
+For repeatable smoke validation, `yarn verify:mvp4 --restart` exercises only an empty disposable mock stack with the automation server flag enabled and memory initially off. The script explicitly enables memory through its API and verifies restart durability. Set `AURA_API_URL` to its API origin; set `COMPOSE_PROJECT_NAME` and `COMPOSE_FILE` to that same isolated stack when using `--restart`. It refuses non-mock health or existing rules/preferences. It creates simulated light operations and historical audit receipts; it leaves memory and global execution disabled and removes its active rule/preference. Run restart checks sequentially with other Compose/voice verification commands.
 
 ## Wake word on Linux/Pi
 

@@ -31,4 +31,9 @@ export const preferenceListSchema = z.object({
   enabled: z.boolean(),
   preferences: z.array(preferenceSchema).max(2),
 });
+export const memoryControlSchema = z.discriminatedUnion('enabled', [
+  z.object({ enabled: z.literal(true), consent: z.literal(true) }).strict(),
+  z.object({ enabled: z.literal(false) }).strict(),
+]);
+export const memoryControlResponseSchema = z.object({ enabled: z.boolean() });
 export type ApprovedPreference = z.infer<typeof preferenceSchema>;

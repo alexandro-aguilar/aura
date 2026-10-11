@@ -53,6 +53,8 @@ yarn dev:web
 
 Open **http://localhost:5173**. The API listens on **http://127.0.0.1:3001**. Vite proxies `/api` HTTP and WebSocket requests to it. Use `localhost` for the browser URL so its origin matches the default `WEB_ORIGIN`; set that variable if you use another browser origin.
 
+Each navigation item opens its own page: **Things** (`#/things`), **Conversation** (`#/conversation`), **Voice** (`#/voice`), and **Settings** (`#/settings`, preferences and automations). Page links support reload and browser Back/Forward. Conversation history and unsent form drafts stay available while switching pages within the session. Leaving Voice discards an unsent recording or stops playback; submitted turns finish and their replies remain available.
+
 The initial `yarn check` builds shared packages. After editing shared package source, run `yarn build` again. The API watch process watches its source; the UI uses Vite. To run the compiled API, use `node --env-file-if-exists=.env apps/api/dist/main.js` after building.
 
 ### Try the slice
@@ -185,7 +187,7 @@ Voice uses the same device grants and audit as typed chat. A submitted action ma
 
 ### Advanced capabilities (MVP4)
 
-Memory and automations are implemented behind independent `MEMORY_ENABLED=false` and `AUTOMATIONS_ENABLED=false` server flags. The PWA supports approved language/style preferences with inspect/edit/delete, plus disabled-by-default light-transition rules, dry-run, explicit activation, receipts and emergency stop. Mock `show preferences` reports active memory. Automations use existing snapshots and the same grants/audit as direct controls; no MQTT or LLM rule activation is needed.
+Memory defaults to off and is configured at runtime in **Settings → Approved preferences** or `POST /preferences/control`; SQLite preserves its setting across restarts. Enable with `{"enabled":true,"consent":true}`, disable with `{"enabled":false}`, and inspect `GET /preferences`. Changes apply when new chat processing begins (typed or voice), without a restart; already running agent turns retain their context snapshot. The retired `MEMORY_ENABLED` variable is ignored. Automations remain behind the independent `AUTOMATIONS_ENABLED=false` server flag. The PWA supports approved language/style preferences with inspect/edit/delete, plus disabled-by-default light-transition rules, dry-run, explicit activation, receipts and emergency stop. Mock `show preferences` reports active memory. Automations use existing snapshots and the same grants/audit as direct controls; no MQTT or LLM rule activation is needed.
 
 The optional Linux wake CLI is `yarn voice:wake`. It needs `WAKE_ENABLED=true` and your own `PICOVOICE_ACCESS_KEY` in private `.env.voice-satellite`; starts muted; uses `u`/`m`/`q` plus Enter; and defaults to the keyword **Porcupine**. No AccessKey is needed for fixture tests. Enable and accept one capability at a time. See [MVP4 setup/recovery](docs/deployment/mvp4.md), [contracts](docs/specs/mvp4.md) and [verification](docs/verification/mvp4.md). Pi wake accuracy/echo and existing browser/live speech acceptance remain open.
 

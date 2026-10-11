@@ -1,10 +1,16 @@
 import { useEffect, useState } from 'react';
-import { preferenceListSchema, preferenceRequestSchema } from '@aura/contracts';
+import {
+  preferenceListSchema,
+  preferenceRequestSchema,
+  memoryControlSchema,
+  memoryControlResponseSchema,
+} from '@aura/contracts';
 import type { ApprovedPreference } from '@aura/contracts';
 
 export function PreferencesPanel() {
   const [entries, setEntries] = useState<ApprovedPreference[]>([]);
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState<boolean | null>(null);
+  const [memoryConsent, setMemoryConsent] = useState(false);
   const [category, setCategory] = useState('response_language');
   const [value, setValue] = useState('en');
   const [consent, setConsent] = useState(false);
@@ -24,6 +30,51 @@ export function PreferencesPanel() {
       setError(e instanceof Error ? e.message : 'Preferences unavailable.'),
     );
   }, []);
+  async function controlMemory() {
+    if (enabled === null || busy) return;
+    setBusy(true);
+    setError('');
+    try {
+      const response = await fetch('/api/preferences/control', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(
+          memoryControlSchema.parse(
+            enabled
+              ? { enabled: false }
+              : { enabled: true, consent: memoryConsent },
+          ),
+        ),
+        signal: AbortSignal.timeout(5000),
+      });
+      if (!response.ok)
+        throw new Error('Could not change memory. Refresh before retrying.');
+      const state = memoryControlResponseSchema.parse(await response.json());
+      setEnabled(state.enabled);
+      setMemoryConsent(false);
+      await refresh();
+    } catch (failure) {
+      setError(
+        failure instanceof Error ? failure.message : 'Memory unavailable.',
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function reload() {
+    setBusy(true);
+    setError('');
+    try {
+      await refresh();
+      setMemoryConsent(false);
+    } catch (failure) {
+      setError(
+        failure instanceof Error ? failure.message : 'Preferences unavailable.',
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
   async function mutate(id?: string) {
     setBusy(true);
     setError('');
@@ -32,10 +83,10 @@ export function PreferencesPanel() {
         id ? `/api/preferences/${id}` : '/api/preferences',
         {
           method: id ? 'DELETE' : 'POST',
-          headers: { 'Content-Type': 'application/json' },
           ...(id
             ? {}
             : {
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(
                   preferenceRequestSchema.parse({ category, value, consent }),
                 ),
@@ -59,15 +110,48 @@ export function PreferencesPanel() {
     <aside
       className="settings-panel preferences-panel"
       aria-label="Approved preferences"
-      data-enabled={enabled}
+      data-enabled={enabled ?? false}
       data-busy={busy}
     >
       <h2>Approved preferences</h2>
-      <p>
-        {enabled
-          ? 'Approved preferences apply to new chat and voice turns.'
-          : 'Memory context is disabled on the server. Saved preferences will apply only after it is enabled.'}
+      <p role="status">
+        {enabled === null
+          ? 'Loading memory settings…'
+          : enabled
+            ? 'Approved preferences apply to new chat and voice turns.'
+            : 'Saved preferences are paused. Enable memory to use them in new chat and voice turns.'}
       </p>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          void controlMemory();
+        }}
+      >
+        {enabled === false && (
+          <label className="consent">
+            <input
+              type="checkbox"
+              checked={memoryConsent}
+              disabled={busy}
+              onChange={(event) => setMemoryConsent(event.target.checked)}
+            />{' '}
+            I approve using saved preferences in new chat and voice turns.
+          </label>
+        )}
+        <button
+          disabled={busy || enabled === null || (!enabled && !memoryConsent)}
+        >
+          {enabled ? 'Disable memory' : 'Enable memory'}
+        </button>
+        <button
+          className="action-secondary"
+          type="button"
+          disabled={busy}
+          onClick={() => void reload()}
+        >
+          Refresh preferences
+        </button>
+      </form>
       <ul>
         {entries.map((entry) => (
           <li key={entry.id}>

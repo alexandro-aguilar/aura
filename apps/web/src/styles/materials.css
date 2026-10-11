@@ -36,6 +36,30 @@
   @supports (
     (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
   ) {
+    @keyframes aura-backdrop-enter {
+      from {
+        -webkit-backdrop-filter: blur(var(--aura-glass-blur-enter))
+          saturate(var(--aura-glass-saturation));
+        backdrop-filter: blur(var(--aura-glass-blur-enter))
+          saturate(var(--aura-glass-saturation));
+      }
+      to {
+        -webkit-backdrop-filter: blur(var(--aura-glass-blur))
+          saturate(var(--aura-glass-saturation));
+        backdrop-filter: blur(var(--aura-glass-blur))
+          saturate(var(--aura-glass-saturation));
+      }
+    }
+
+    /* One entrance per visible glass surface; preferences keep the static fallback. */
+    @media (prefers-reduced-motion: no-preference) and (prefers-contrast: no-preference) and (forced-colors: none) {
+      .aura-app > :is(.devices, .dashboard-chat):not([hidden]),
+      .dashboard-voice:not([hidden]) > .voice-panel,
+      .dashboard-settings:not([hidden]) > .settings-panel {
+        animation-name: aura-enter, aura-backdrop-enter;
+      }
+    }
+
     :is(
       .aura-material-glass,
       .devices,
@@ -51,14 +75,23 @@
       backdrop-filter: blur(var(--aura-glass-blur))
         saturate(var(--aura-glass-saturation));
       box-shadow:
-        inset 0 1px 0 var(--aura-highlight),
-        inset 0 -1px 0 var(--aura-highlight),
+        inset 0 var(--aura-border-width) 0 var(--aura-highlight),
+        inset 0 calc(-1 * var(--aura-border-width)) 0 var(--aura-highlight),
         var(--aura-shadow-glass);
     }
   }
 }
 
 @layer accessibility {
+  /* An unsupported transparency query must not prevent motion in older engines. */
+  @media (prefers-reduced-transparency: reduce) and (prefers-reduced-motion: no-preference) {
+    .aura-app > :is(.devices, .dashboard-chat):not([hidden]),
+    .dashboard-voice:not([hidden]) > .voice-panel,
+    .dashboard-settings:not([hidden]) > .settings-panel {
+      animation-name: aura-enter;
+    }
+  }
+
   @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
     :is(
       .aura-material-glass,

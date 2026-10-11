@@ -28,7 +28,6 @@ export interface Config {
   model: string;
   deviceBackend: DeviceBackend;
   speech: SpeechConfig;
-  memoryEnabled: boolean;
   automationsEnabled: boolean;
   automationPollMs: number;
 }
@@ -43,9 +42,6 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env): Config {
     automationPollMs > 60000
   )
     throw new Error('AUTOMATION_POLL_MS must be 1000–60000');
-  const memoryEnabled = env.MEMORY_ENABLED ?? 'false';
-  if (!['true', 'false'].includes(memoryEnabled))
-    throw new Error('MEMORY_ENABLED must be true or false');
   const mode = env.AGENT_MODE ?? 'mock';
   if (mode !== 'mock' && mode !== 'openai')
     throw new Error('AGENT_MODE must be mock or openai');
@@ -186,7 +182,6 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env): Config {
     model: env.OPENAI_MODEL ?? 'gpt-5.4',
     deviceBackend,
     speech,
-    memoryEnabled: memoryEnabled === 'true',
     automationsEnabled: automationFlag === 'true',
     automationPollMs,
   };

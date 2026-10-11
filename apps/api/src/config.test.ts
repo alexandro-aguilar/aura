@@ -103,23 +103,19 @@ describe('speech configuration', () => {
 });
 
 describe('independent MVP4 switches', () => {
-  it('defaults to disabled memory and automations', () => {
+  it('defaults to disabled automations and ignores the retired memory environment flag', () => {
     expect(readConfig({})).toMatchObject({
-      memoryEnabled: false,
       automationsEnabled: false,
       automationPollMs: 5000,
     });
     expect(readConfig({ MEMORY_ENABLED: 'true' })).toMatchObject({
-      memoryEnabled: true,
       automationsEnabled: false,
     });
     expect(readConfig({ AUTOMATIONS_ENABLED: 'true' })).toMatchObject({
-      memoryEnabled: false,
       automationsEnabled: true,
     });
   });
   it.each([
-    { MEMORY_ENABLED: 'yes' },
     { AUTOMATIONS_ENABLED: 'yes' },
     { AUTOMATION_POLL_MS: '999' },
     { AUTOMATION_POLL_MS: '60001' },

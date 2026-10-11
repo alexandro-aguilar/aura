@@ -3,9 +3,15 @@
 @import './styles/tokens.css';
 @import './styles/base.css';
 @import './styles/materials.css';
+@import './styles/motion.css';
 
 /* Component layout and states consume the shared tokens and materials. */
 @layer components {
+  :root {
+    scroll-padding-block-start: calc(
+      2 * var(--aura-control-min-size) + var(--aura-space-12)
+    );
+  }
   .aura-app {
     display: grid;
     gap: var(--aura-space-6);
@@ -22,6 +28,9 @@
     padding: var(--aura-space-4) 0;
   }
   .dashboard-nav {
+    position: sticky;
+    top: var(--aura-space-4);
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -36,6 +45,8 @@
     background: var(--aura-surface-content);
   }
   .dashboard-nav a {
+    position: relative;
+    z-index: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -57,39 +68,6 @@
     font-size: var(--aura-text-heading);
     color: var(--aura-accent);
   }
-  .home-scene {
-    position: relative;
-    min-height: 20rem;
-    border-radius: var(--aura-radius-panel);
-    overflow: hidden;
-    background:
-      linear-gradient(0deg, rgb(0 0 0 / 85%), transparent 85%),
-      url('/images/home-interior.jpg') center / cover;
-    border: var(--aura-border-width) solid var(--aura-glass-edge);
-    box-shadow: var(--aura-shadow-glass);
-  }
-  .scene-caption {
-    position: absolute;
-    inset: auto var(--aura-space-6) var(--aura-space-6);
-  }
-  .scene-caption h2 {
-    font-size: 1.8rem;
-    font-weight: var(--aura-weight-medium);
-    line-height: var(--aura-leading-heading);
-    margin-block: var(--aura-space-3);
-  }
-  .scene-caption p {
-    margin-bottom: 0;
-    color: var(--aura-text-muted);
-  }
-  .scene-badge {
-    position: absolute;
-    inset: var(--aura-space-4) auto auto var(--aura-space-4);
-    background: var(--aura-surface-content);
-    padding: var(--aura-space-2) var(--aura-space-3);
-    border-radius: var(--aura-radius-pill);
-    font-size: var(--aura-text-small);
-  }
   .dashboard-chat {
     padding: var(--aura-space-6);
     border: var(--aura-border-width) solid var(--aura-border);
@@ -110,32 +88,28 @@
   .dashboard-voice .voice-panel {
     height: 100%;
   }
-  .dashboard-settings,
-  .dashboard-voice,
-  #conversation,
-  #lights {
-    scroll-margin-top: var(--aura-space-6);
+  /* Keep inactive pages mounted to preserve drafts and in-flight requests. */
+  .aura-app > [hidden] {
+    display: none;
+  }
+  .dashboard-nav a[aria-current='page'] {
+    background: var(--aura-accent);
+    color: var(--aura-on-accent);
+    font-weight: var(--aura-weight-bold);
+  }
+  .nav-indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: var(--aura-radius-pill);
+    background: var(--aura-accent);
+    pointer-events: none;
+  }
+  .dashboard-nav[data-indicator-ready='true'] a[aria-current='page'] {
+    background: transparent;
   }
   @media (min-width: 64rem) {
-    .aura-app {
-      grid-template-columns: repeat(12, minmax(0, 1fr));
-    }
-    .dashboard-nav {
-      grid-column: 1 / -1;
-    }
-    .aura-app > header,
-    .home-scene,
-    .devices {
-      grid-column: span 4;
-    }
-    .dashboard-chat {
-      grid-column: span 8;
-    }
-    .dashboard-voice {
-      grid-column: span 4;
-    }
     .dashboard-settings {
-      grid-column: 1 / -1;
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
@@ -166,8 +140,28 @@
     content: '';
     flex: 0 0 var(--aura-space-2);
     height: var(--aura-space-2);
-    background: currentColor;
+    background: var(--aura-canvas);
+    border: var(--aura-border-width) solid var(--aura-border-control);
     border-radius: var(--aura-radius-pill);
+  }
+  .status[data-connection='connected']::before {
+    background: var(--aura-accent);
+    border-color: transparent;
+    box-shadow: 0 0 0 var(--aura-space-1)
+      color-mix(in srgb, var(--aura-accent) 15%, transparent);
+    animation: aura-status-pulse var(--aura-duration-status-pulse) ease-in-out
+      infinite;
+  }
+  @keyframes aura-status-pulse {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(0.8);
+      opacity: 0.6;
+    }
   }
   .status[data-connection='connecting'],
   .status[data-connection='disconnected'] {
@@ -256,8 +250,7 @@
   .composer button {
     flex: 0 0 auto;
   }
-  .composer input,
-  .composer button {
+  .composer input {
     transition:
       background-color var(--aura-duration-fast) var(--aura-ease),
       border-color var(--aura-duration-fast) var(--aura-ease);
@@ -320,9 +313,6 @@
   :where(.devices, .voice-panel, .settings-panel) button {
     max-width: 100%;
     overflow-wrap: anywhere;
-    transition:
-      background-color var(--aura-duration-fast) var(--aura-ease),
-      border-color var(--aura-duration-fast) var(--aura-ease);
   }
 
   :where(.devices, .voice-panel, .settings-panel)
@@ -389,11 +379,35 @@
     padding: 0;
     margin-block: var(--aura-space-4);
   }
-  .device-list > li,
   .settings-panel li {
     padding-block: var(--aura-space-4);
     border-top: var(--aura-border-width) solid var(--aura-border);
     overflow-wrap: anywhere;
+  }
+  .device-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+    gap: var(--aura-space-4);
+  }
+  .device-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: var(--aura-space-3);
+    padding: var(--aura-space-5);
+    border: var(--aura-border-width) solid var(--aura-border);
+    border-radius: var(--aura-radius-message);
+    background: var(--aura-surface-content);
+    overflow-wrap: anywhere;
+  }
+  .device-card .device-name,
+  .device-card .device-state,
+  .device-card small {
+    margin: 0;
+  }
+  .device-card .light-controls {
+    margin-block: auto 0;
+    padding-block-start: var(--aura-space-1);
   }
   .device-state {
     font-weight: var(--aura-weight-medium);
@@ -553,20 +567,28 @@
 }
 
 @layer accessibility {
-  @media (prefers-reduced-transparency: reduce),
-    (prefers-contrast: more),
-    (forced-colors: active) {
-    .home-scene {
-      background: var(--aura-surface-content);
-    }
-  }
   @media (forced-colors: active) {
+    .nav-indicator {
+      display: none;
+    }
+    .status::before {
+      background: Canvas;
+      border-color: GrayText;
+    }
+    .status[data-connection='connected']::before {
+      background: Highlight;
+      border-color: Highlight;
+      box-shadow: none;
+    }
     .dashboard-nav a {
       color: LinkText;
     }
-    .dashboard-nav .nav-brand,
-    .scene-badge {
+    .dashboard-nav .nav-brand {
       background: Canvas;
+    }
+    .dashboard-nav a[aria-current='page'] {
+      background: Highlight;
+      color: HighlightText;
     }
   }
 }

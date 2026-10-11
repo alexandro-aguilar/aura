@@ -41,6 +41,10 @@ export const preferences = sqliteTable('approved_preferences', {
     () => conversations.id,
   ),
 });
+export const memoryControl = sqliteTable('memory_control', {
+  id: integer('id').primaryKey(),
+  enabled: integer('enabled', { mode: 'boolean' }).notNull(),
+});
 
 export const automationRules = sqliteTable('automation_rules', {
   id: text('id').primaryKey(),

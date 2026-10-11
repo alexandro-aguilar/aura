@@ -1,5 +1,6 @@
 {
   "name": "home-intelligence-agent",
+  "description": "Ambient Unified Responsive Assistant. Elegant, minimal, and particularly suitable for an ambient, voice-first AI.",
   "private": true,
   "type": "module",
   "packageManager": "yarn@4.13.0",

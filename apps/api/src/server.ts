@@ -23,6 +23,7 @@ import {
   chatRequestSchema,
   deviceControlRequestSchema,
   preferenceRequestSchema,
+  memoryControlSchema,
 } from '@aura/contracts';
 import {
   HomeAssistantDeviceGateway,
@@ -122,7 +123,7 @@ export async function buildServer(
     persistence.conversations,
     agent,
     runtime,
-    config.memoryEnabled ? persistence.preferences : undefined,
+    persistence.preferences,
   );
   const preferenceService = new PreferenceService(
     persistence.preferences,
@@ -202,9 +203,18 @@ export async function buildServer(
     options.speech,
   );
   app.get('/preferences', async () => ({
-    enabled: config.memoryEnabled,
+    enabled: preferenceService.enabled(),
     preferences: preferenceService.list(),
   }));
+  app.post('/preferences/control', async (request, reply) => {
+    const parsed = memoryControlSchema.safeParse(request.body);
+    if (!parsed.success)
+      return reply.code(400).send({
+        code: 'INVALID_REQUEST',
+        message: 'Choose a memory state and explicitly approve enabling it.',
+      });
+    return preferenceService.control(parsed.data);
+  });
   app.post('/preferences', async (request, reply) => {
     const parsed = preferenceRequestSchema.safeParse(request.body);
     if (!parsed.success)
