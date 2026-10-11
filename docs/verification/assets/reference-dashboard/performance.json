@@ -1,0 +1,44 @@
+[
+  {
+    "engine": "chromium",
+    "opaque": false,
+    "paintCount": 1250,
+    "paintMs": 277.1,
+    "streamDeltas": 600,
+    "frameCount": 673,
+    "p95FrameMs": 18.1,
+    "maxFrameMs": 20.8,
+    "framesOver50ms": 0,
+    "longTasks": [],
+    "metrics": {
+      "Timestamp": 10.919897999992827,
+      "LayoutCount": 600,
+      "RecalcStyleCount": 10,
+      "LayoutDuration": 1.301453,
+      "RecalcStyleDuration": 0.0005499999999999999,
+      "ScriptDuration": 1.052759,
+      "TaskDuration": 3.21237
+    }
+  },
+  {
+    "engine": "chromium",
+    "opaque": true,
+    "paintCount": 1232,
+    "paintMs": 252.79,
+    "streamDeltas": 600,
+    "frameCount": 660,
+    "p95FrameMs": 17.9,
+    "maxFrameMs": 21.8,
+    "framesOver50ms": 0,
+    "longTasks": [],
+    "metrics": {
+      "Timestamp": 10.714987000013934,
+      "LayoutCount": 600,
+      "RecalcStyleCount": 11,
+      "LayoutDuration": 1.352142,
+      "RecalcStyleDuration": 0.000568,
+      "ScriptDuration": 1.019748,
+      "TaskDuration": 3.158737
+    }
+  }
+]

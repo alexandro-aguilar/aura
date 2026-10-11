@@ -1,0 +1,98 @@
+/* Shared glass for the reference-inspired dashboard; opaque reading fields. */
+@layer materials {
+  .aura-material-content,
+  .aura-material-subtle,
+  :is(
+    .aura-material-glass,
+    .devices,
+    .voice-panel,
+    .dashboard-chat,
+    .settings-panel,
+    .dashboard-nav
+  ) {
+    background: var(--aura-surface-content);
+    color: var(--aura-text);
+    border: var(--aura-border-width) solid var(--aura-border);
+    border-radius: var(--aura-radius-panel);
+  }
+
+  .aura-material-subtle {
+    background: var(--aura-surface-subtle);
+  }
+
+  :is(
+    .aura-material-glass,
+    .devices,
+    .voice-panel,
+    .dashboard-chat,
+    .settings-panel,
+    .dashboard-nav
+  ) {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: var(--aura-shadow-glass);
+  }
+
+  @supports (
+    (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+  ) {
+    :is(
+      .aura-material-glass,
+      .devices,
+      .voice-panel,
+      .dashboard-chat,
+      .settings-panel,
+      .dashboard-nav
+    ) {
+      background: var(--aura-glass-tint);
+      border-color: var(--aura-glass-edge);
+      -webkit-backdrop-filter: blur(var(--aura-glass-blur))
+        saturate(var(--aura-glass-saturation));
+      backdrop-filter: blur(var(--aura-glass-blur))
+        saturate(var(--aura-glass-saturation));
+      box-shadow:
+        inset 0 1px 0 var(--aura-highlight),
+        inset 0 -1px 0 var(--aura-highlight),
+        var(--aura-shadow-glass);
+    }
+  }
+}
+
+@layer accessibility {
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    :is(
+      .aura-material-glass,
+      .devices,
+      .voice-panel,
+      .dashboard-chat,
+      .settings-panel,
+      .dashboard-nav
+    ) {
+      background: var(--aura-surface-content);
+      border-color: var(--aura-border);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      box-shadow: var(--aura-shadow-glass);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .aura-material-content,
+    .aura-material-subtle,
+    :is(
+      .aura-material-glass,
+      .devices,
+      .voice-panel,
+      .dashboard-chat,
+      .settings-panel,
+      .dashboard-nav
+    ) {
+      background: Canvas;
+      color: CanvasText;
+      border-color: CanvasText;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      box-shadow: none;
+    }
+  }
+}

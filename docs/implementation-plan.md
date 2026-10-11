@@ -13,6 +13,8 @@ Read [AGENTS.md](../AGENTS.md), [README](../README.md) and the [specifications i
 
 See [architecture](specs/architecture.md) for package ownership and dependency rules. Specs define acceptance; phase plans define task order and evidence. Later-phase plans are design proposals, not statements that features already exist.
 
+The [CSS design system plan](plans/frontend-liquid-glass.md) defines a separate, incremental Liquid Glass-inspired styling pass for the existing frontend, including tokens, accessibility fallbacks, panel styling and visual verification.
+
 ## Working process
 
 1. Select the next unfinished slice in the current phase and its requirement IDs.

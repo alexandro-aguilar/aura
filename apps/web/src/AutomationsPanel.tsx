@@ -74,7 +74,13 @@ export function AutomationsPanel() {
     }
   }
   return (
-    <aside className="settings-panel" aria-label="Deterministic automations">
+    <aside
+      className="settings-panel automations-panel"
+      aria-label="Deterministic automations"
+      data-available={available}
+      data-enabled={enabled}
+      data-busy={busy}
+    >
       <h2>Automations</h2>
       <p>
         {!available
@@ -85,6 +91,7 @@ export function AutomationsPanel() {
         All new rules start disabled.
       </p>
       <button
+        className="action-danger emergency-stop"
         type="button"
         onClick={() => void mutate('/control', { enabled: false })}
       >
@@ -191,6 +198,7 @@ export function AutomationsPanel() {
             . Cooldown {rule.cooldownSeconds}s.{' '}
             {rule.enabled ? 'Enabled' : 'Disabled'}.
             <button
+              className={rule.enabled ? 'action-secondary' : undefined}
               disabled={busy || (!rule.enabled && (!available || !consent))}
               onClick={() =>
                 void mutate(
@@ -204,6 +212,7 @@ export function AutomationsPanel() {
               {rule.enabled ? 'Disable' : 'Approve and enable'} {rule.name}
             </button>
             <button
+              className="action-secondary"
               disabled={busy}
               onClick={() =>
                 void mutate(`/${rule.id}/dry-run`, {
@@ -218,6 +227,7 @@ export function AutomationsPanel() {
               Dry run {rule.name}
             </button>
             <button
+              className="action-danger"
               disabled={busy}
               onClick={() => void mutate(`/${rule.id}`, undefined, 'DELETE')}
             >
@@ -232,6 +242,7 @@ export function AutomationsPanel() {
         action already dispatched.
       </p>
       <button
+        className="action-secondary"
         disabled={busy}
         onClick={() =>
           void refresh().catch(() => setMessage('Refresh failed.'))
@@ -239,9 +250,9 @@ export function AutomationsPanel() {
       >
         Refresh rules and receipts
       </button>
-      <ul>
+      <ul className="automation-receipts">
         {runs.map((run) => (
-          <li key={run.id}>
+          <li key={run.id} data-outcome={run.status}>
             {run.rule.name}: {run.status} at{' '}
             {new Date(run.createdAt).toLocaleString()} ·{' '}
             <a
@@ -256,7 +267,11 @@ export function AutomationsPanel() {
           </li>
         ))}
       </ul>
-      {message && <p role="status">{message}</p>}
+      {message && (
+        <p className="panel-notice" role="status">
+          {message}
+        </p>
+      )}
     </aside>
   );
 }

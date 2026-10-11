@@ -1,0 +1,118 @@
+@layer base {
+  :root {
+    font-family: var(--aura-font-body);
+    font-size: 100%;
+    font-weight: var(--aura-weight-normal);
+    line-height: var(--aura-leading-body);
+    color: var(--aura-text);
+    background: var(--aura-canvas);
+    font-synthesis: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      linear-gradient(rgb(8 12 10 / 70%), rgb(8 12 10 / 70%)),
+      url('/images/home-interior.jpg') center / cover fixed;
+  }
+
+  :where(button, input, select, textarea) {
+    font: inherit;
+  }
+
+  :where(a) {
+    color: var(--aura-accent);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  :where(code, pre) {
+    font-family: var(--aura-font-mono);
+  }
+
+  :where(.composer, .devices, .voice-panel, .settings-panel) button {
+    min-width: var(--aura-control-min-size);
+    min-height: var(--aura-control-min-size);
+    border: var(--aura-border-width) solid transparent;
+    border-radius: var(--aura-radius-control);
+    padding: var(--aura-space-4);
+    background: var(--aura-accent);
+    color: var(--aura-on-accent);
+    font-weight: var(--aura-weight-medium);
+    cursor: pointer;
+  }
+
+  :where(
+    .composer input,
+    .settings-panel select,
+    .settings-panel input:not([type='checkbox'])
+  ) {
+    min-width: 0;
+    min-height: var(--aura-control-min-size);
+    max-width: 100%;
+    border: var(--aura-border-width) solid var(--aura-border-control);
+    border-radius: var(--aura-radius-control);
+    background: var(--aura-surface-content);
+    color: var(--aura-text);
+  }
+
+  :where(input, textarea)::placeholder {
+    color: var(--aura-text-muted);
+    opacity: 1;
+  }
+
+  :where(.settings-panel input[type='checkbox']) {
+    accent-color: var(--aura-accent);
+  }
+
+  :where(.composer, .devices, .voice-panel, .settings-panel) :disabled {
+    background: var(--aura-surface-subtle);
+    color: var(--aura-disabled-text);
+    border-color: var(--aura-border-control);
+    cursor: default;
+  }
+
+  :focus-visible {
+    outline: var(--aura-focus-width) solid var(--aura-focus);
+    outline-offset: var(--aura-focus-offset);
+  }
+}
+
+@layer accessibility {
+  @media (prefers-reduced-transparency: reduce),
+    (prefers-contrast: more),
+    (forced-colors: active) {
+    body {
+      background: var(--aura-canvas);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation: none;
+      transition: none;
+      scroll-behavior: auto;
+    }
+  }
+
+  @media (forced-colors: active) {
+    :where(.composer, .devices, .voice-panel, .settings-panel) button {
+      background: ButtonFace;
+      color: ButtonText;
+      border-color: ButtonText;
+    }
+
+    :where(.composer, .devices, .voice-panel, .settings-panel) :disabled {
+      color: GrayText;
+      border-color: GrayText;
+    }
+  }
+}

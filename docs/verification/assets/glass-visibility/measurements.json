@@ -1,0 +1,2347 @@
+{
+  "date": "2026-10-10",
+  "contrast": [
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "selector": "eyebrow",
+      "text": "HOME INTELLIGENCE",
+      "foreground": [
+        82,
+        102,
+        91
+      ],
+      "x": 231,
+      "y": 56.5,
+      "disabled": false,
+      "background": [
+        231,
+        240,
+        232
+      ],
+      "ratio": 5.29
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "selector": "H1",
+      "text": "Aura",
+      "foreground": [
+        23,
+        59,
+        50
+      ],
+      "x": 231,
+      "y": 105,
+      "disabled": false,
+      "background": [
+        230,
+        239,
+        232
+      ],
+      "ratio": 10.47
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "selector": "status",
+      "text": "Connected · mock agent · simulated devices",
+      "foreground": [
+        23,
+        59,
+        50
+      ],
+      "x": 195,
+      "y": 216.5,
+      "disabled": false,
+      "background": [
+        232,
+        238,
+        231
+      ],
+      "ratio": 10.43
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "selector": "H2",
+      "text": "Lights",
+      "foreground": [
+        23,
+        59,
+        50
+      ],
+      "x": 61.4609375,
+      "y": 310,
+      "disabled": false,
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 12.29
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "selector": "device-state",
+      "text": "off",
+      "foreground": [
+        82,
+        102,
+        91
+      ],
+      "x": 142.609375,
+      "y": 472,
+      "disabled": false,
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 6.16
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "selector": "SMALL",
+      "text": "Observed 10/10/2026, 5:36:50 PM",
+      "foreground": [
+        82,
+        102,
+        91
+      ],
+      "x": 195,
+      "y": 502.5,
+      "disabled": false,
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 6.16
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "selector": "H2",
+      "text": "Start with a light.",
+      "foreground": [
+        23,
+        59,
+        50
+      ],
+      "x": 195,
+      "y": 638,
+      "disabled": false,
+      "background": [
+        237,
+        241,
+        225
+      ],
+      "ratio": 10.7
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "selector": "P",
+      "text": "Try “list devices” or “turn on living room”.",
+      "foreground": [
+        82,
+        102,
+        91
+      ],
+      "x": 195,
+      "y": 678.59375,
+      "disabled": false,
+      "background": [
+        238,
+        241,
+        226
+      ],
+      "ratio": 5.37
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "selector": "P",
+      "text": "Living room and bedroom are available as mock lights.",
+      "foreground": [
+        82,
+        102,
+        91
+      ],
+      "x": 195,
+      "y": 730.59375,
+      "disabled": false,
+      "background": [
+        239,
+        242,
+        228
+      ],
+      "ratio": 5.42
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "selector": "LABEL",
+      "text": "Message Aura",
+      "foreground": [
+        23,
+        59,
+        50
+      ],
+      "x": 195,
+      "y": 943,
+      "disabled": false,
+      "background": [
+        254,
+        254,
+        253
+      ],
+      "ratio": 12.18
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "selector": "message",
+      "text": "",
+      "foreground": [
+        23,
+        59,
+        50
+      ],
+      "x": 154.9765625,
+      "y": 992,
+      "disabled": false,
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 12.29
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "selector": "BUTTON",
+      "text": "Send",
+      "foreground": [
+        255,
+        255,
+        255
+      ],
+      "x": 316.9765625,
+      "y": 992,
+      "disabled": false,
+      "background": [
+        36,
+        92,
+        70
+      ],
+      "ratio": 7.79
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "selector": "H2",
+      "text": "Approved preferences",
+      "foreground": [
+        23,
+        59,
+        50
+      ],
+      "x": 195,
+      "y": 1095,
+      "disabled": false,
+      "background": [
+        254,
+        254,
+        254
+      ],
+      "ratio": 12.19
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "selector": "action-danger emergency-stop",
+      "text": "Emergency stop all automations",
+      "foreground": [
+        161,
+        45,
+        50
+      ],
+      "x": 195,
+      "y": 1872,
+      "disabled": false,
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 7.15
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "selector": "voice-phase",
+      "text": "Voice: idle",
+      "foreground": [
+        23,
+        59,
+        50
+      ],
+      "x": 195,
+      "y": 3052.5,
+      "disabled": false,
+      "background": [
+        232,
+        238,
+        231
+      ],
+      "ratio": 10.43
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "selector": "SMALL",
+      "text": "Discard sends nothing. Stop playback only stops the speaker.",
+      "foreground": [
+        82,
+        102,
+        91
+      ],
+      "x": 195,
+      "y": 3202,
+      "disabled": false,
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 6.16
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "text",
+      "foreground": [
+        23,
+        59,
+        50
+      ],
+      "background": [
+        224,
+        224,
+        224
+      ],
+      "ratio": 9.31
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "text-muted",
+      "foreground": [
+        82,
+        102,
+        91
+      ],
+      "background": [
+        224,
+        224,
+        224
+      ],
+      "ratio": 4.66
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "border-control",
+      "foreground": [
+        107,
+        126,
+        113
+      ],
+      "background": [
+        224,
+        224,
+        224
+      ],
+      "ratio": 3.28
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "focus",
+      "foreground": [
+        120,
+        85,
+        26
+      ],
+      "background": [
+        224,
+        224,
+        224
+      ],
+      "ratio": 5.11
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "success",
+      "foreground": [
+        36,
+        92,
+        70
+      ],
+      "background": [
+        224,
+        224,
+        224
+      ],
+      "ratio": 5.9
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "warning",
+      "foreground": [
+        119,
+        80,
+        11
+      ],
+      "background": [
+        224,
+        224,
+        224
+      ],
+      "ratio": 5.42
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "danger",
+      "foreground": [
+        161,
+        45,
+        50
+      ],
+      "background": [
+        224,
+        224,
+        224
+      ],
+      "ratio": 5.42
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "text",
+      "foreground": [
+        23,
+        59,
+        50
+      ],
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 12.29
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "text-muted",
+      "foreground": [
+        82,
+        102,
+        91
+      ],
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 6.16
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "border-control",
+      "foreground": [
+        107,
+        126,
+        113
+      ],
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 4.33
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "focus",
+      "foreground": [
+        120,
+        85,
+        26
+      ],
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 6.75
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "success",
+      "foreground": [
+        36,
+        92,
+        70
+      ],
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 7.79
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "warning",
+      "foreground": [
+        119,
+        80,
+        11
+      ],
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 7.15
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "danger",
+      "foreground": [
+        161,
+        45,
+        50
+      ],
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 7.15
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "selector": "eyebrow",
+      "text": "HOME INTELLIGENCE",
+      "foreground": [
+        180,
+        198,
+        184
+      ],
+      "x": 231,
+      "y": 56.5,
+      "disabled": false,
+      "background": [
+        22,
+        39,
+        31
+      ],
+      "ratio": 8.71
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "selector": "H1",
+      "text": "Aura",
+      "foreground": [
+        237,
+        244,
+        237
+      ],
+      "x": 231,
+      "y": 105,
+      "disabled": false,
+      "background": [
+        22,
+        39,
+        30
+      ],
+      "ratio": 13.97
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "selector": "status",
+      "text": "Connected · mock agent · simulated devices",
+      "foreground": [
+        237,
+        244,
+        237
+      ],
+      "x": 195,
+      "y": 216.5,
+      "disabled": false,
+      "background": [
+        39,
+        57,
+        46
+      ],
+      "ratio": 10.97
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "selector": "H2",
+      "text": "Lights",
+      "foreground": [
+        237,
+        244,
+        237
+      ],
+      "x": 61.4609375,
+      "y": 310,
+      "disabled": false,
+      "background": [
+        27,
+        40,
+        32
+      ],
+      "ratio": 13.69
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "selector": "device-state",
+      "text": "off",
+      "foreground": [
+        180,
+        198,
+        184
+      ],
+      "x": 142.609375,
+      "y": 472,
+      "disabled": false,
+      "background": [
+        27,
+        40,
+        32
+      ],
+      "ratio": 8.54
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "selector": "SMALL",
+      "text": "Observed 10/10/2026, 5:36:51 PM",
+      "foreground": [
+        180,
+        198,
+        184
+      ],
+      "x": 195,
+      "y": 502.5,
+      "disabled": false,
+      "background": [
+        27,
+        40,
+        32
+      ],
+      "ratio": 8.54
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "selector": "H2",
+      "text": "Start with a light.",
+      "foreground": [
+        237,
+        244,
+        237
+      ],
+      "x": 195,
+      "y": 638,
+      "disabled": false,
+      "background": [
+        30,
+        39,
+        27
+      ],
+      "ratio": 13.78
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "selector": "P",
+      "text": "Try “list devices” or “turn on living room”.",
+      "foreground": [
+        180,
+        198,
+        184
+      ],
+      "x": 195,
+      "y": 678.59375,
+      "disabled": false,
+      "background": [
+        29,
+        38,
+        27
+      ],
+      "ratio": 8.7
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "selector": "P",
+      "text": "Living room and bedroom are available as mock lights.",
+      "foreground": [
+        180,
+        198,
+        184
+      ],
+      "x": 195,
+      "y": 730.59375,
+      "disabled": false,
+      "background": [
+        28,
+        37,
+        26
+      ],
+      "ratio": 8.81
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "selector": "LABEL",
+      "text": "Message Aura",
+      "foreground": [
+        237,
+        244,
+        237
+      ],
+      "x": 195,
+      "y": 943,
+      "disabled": false,
+      "background": [
+        26,
+        39,
+        31
+      ],
+      "ratio": 13.86
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "selector": "message",
+      "text": "",
+      "foreground": [
+        237,
+        244,
+        237
+      ],
+      "x": 154.9765625,
+      "y": 992,
+      "disabled": false,
+      "background": [
+        27,
+        40,
+        32
+      ],
+      "ratio": 13.69
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "selector": "BUTTON",
+      "text": "Send",
+      "foreground": [
+        19,
+        39,
+        27
+      ],
+      "x": 316.9765625,
+      "y": 992,
+      "disabled": false,
+      "background": [
+        183,
+        215,
+        184
+      ],
+      "ratio": 10.07
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "selector": "H2",
+      "text": "Approved preferences",
+      "foreground": [
+        237,
+        244,
+        237
+      ],
+      "x": 195,
+      "y": 1095,
+      "disabled": false,
+      "background": [
+        27,
+        39,
+        31
+      ],
+      "ratio": 13.83
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "selector": "action-danger emergency-stop",
+      "text": "Emergency stop all automations",
+      "foreground": [
+        255,
+        179,
+        181
+      ],
+      "x": 195,
+      "y": 1872,
+      "disabled": false,
+      "background": [
+        27,
+        40,
+        32
+      ],
+      "ratio": 9.02
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "selector": "voice-phase",
+      "text": "Voice: idle",
+      "foreground": [
+        237,
+        244,
+        237
+      ],
+      "x": 195,
+      "y": 3052.5,
+      "disabled": false,
+      "background": [
+        39,
+        57,
+        46
+      ],
+      "ratio": 10.97
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "selector": "SMALL",
+      "text": "Discard sends nothing. Stop playback only stops the speaker.",
+      "foreground": [
+        180,
+        198,
+        184
+      ],
+      "x": 195,
+      "y": 3202,
+      "disabled": false,
+      "background": [
+        27,
+        40,
+        32
+      ],
+      "ratio": 8.54
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "text",
+      "foreground": [
+        237,
+        244,
+        237
+      ],
+      "background": [
+        52,
+        64,
+        57
+      ],
+      "ratio": 9.68
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "text-muted",
+      "foreground": [
+        180,
+        198,
+        184
+      ],
+      "background": [
+        52,
+        64,
+        57
+      ],
+      "ratio": 6.04
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "border-control",
+      "foreground": [
+        127,
+        149,
+        134
+      ],
+      "background": [
+        25,
+        38,
+        30
+      ],
+      "ratio": 4.89
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "focus",
+      "foreground": [
+        241,
+        199,
+        119
+      ],
+      "background": [
+        25,
+        38,
+        30
+      ],
+      "ratio": 9.85
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "success",
+      "foreground": [
+        183,
+        215,
+        184
+      ],
+      "background": [
+        52,
+        64,
+        57
+      ],
+      "ratio": 6.93
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "warning",
+      "foreground": [
+        241,
+        199,
+        119
+      ],
+      "background": [
+        52,
+        64,
+        57
+      ],
+      "ratio": 6.8
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "danger",
+      "foreground": [
+        255,
+        179,
+        181
+      ],
+      "background": [
+        52,
+        64,
+        57
+      ],
+      "ratio": 6.38
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "text",
+      "foreground": [
+        237,
+        244,
+        237
+      ],
+      "background": [
+        66,
+        78,
+        71
+      ],
+      "ratio": 7.78
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "text-muted",
+      "foreground": [
+        180,
+        198,
+        184
+      ],
+      "background": [
+        66,
+        78,
+        71
+      ],
+      "ratio": 4.85
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "border-control",
+      "foreground": [
+        127,
+        149,
+        134
+      ],
+      "background": [
+        40,
+        53,
+        45
+      ],
+      "ratio": 4
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "focus",
+      "foreground": [
+        241,
+        199,
+        119
+      ],
+      "background": [
+        40,
+        53,
+        45
+      ],
+      "ratio": 8.05
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "success",
+      "foreground": [
+        183,
+        215,
+        184
+      ],
+      "background": [
+        66,
+        78,
+        71
+      ],
+      "ratio": 5.57
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "warning",
+      "foreground": [
+        241,
+        199,
+        119
+      ],
+      "background": [
+        66,
+        78,
+        71
+      ],
+      "ratio": 5.46
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "danger",
+      "foreground": [
+        255,
+        179,
+        181
+      ],
+      "background": [
+        66,
+        78,
+        71
+      ],
+      "ratio": 5.13
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "selector": "eyebrow",
+      "text": "HOME INTELLIGENCE",
+      "foreground": [
+        82,
+        102,
+        91
+      ],
+      "x": 231,
+      "y": 56.5,
+      "disabled": false,
+      "background": [
+        230,
+        240,
+        232
+      ],
+      "ratio": 5.28
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "selector": "H1",
+      "text": "Aura",
+      "foreground": [
+        23,
+        59,
+        50
+      ],
+      "x": 231,
+      "y": 105,
+      "disabled": false,
+      "background": [
+        230,
+        240,
+        232
+      ],
+      "ratio": 10.53
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "selector": "status",
+      "text": "Connected · mock agent · simulated devices",
+      "foreground": [
+        23,
+        59,
+        50
+      ],
+      "x": 195,
+      "y": 216.5,
+      "disabled": false,
+      "background": [
+        232,
+        238,
+        231
+      ],
+      "ratio": 10.43
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "selector": "H2",
+      "text": "Lights",
+      "foreground": [
+        23,
+        59,
+        50
+      ],
+      "x": 61.4609375,
+      "y": 310,
+      "disabled": false,
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 12.29
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "selector": "device-state",
+      "text": "off",
+      "foreground": [
+        82,
+        102,
+        91
+      ],
+      "x": 142.5898895263672,
+      "y": 472,
+      "disabled": false,
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 6.16
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "selector": "SMALL",
+      "text": "Observed 10/10/2026, 5:37:16 PM",
+      "foreground": [
+        82,
+        102,
+        91
+      ],
+      "x": 195,
+      "y": 502.5,
+      "disabled": false,
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 6.16
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "selector": "H2",
+      "text": "Start with a light.",
+      "foreground": [
+        23,
+        59,
+        50
+      ],
+      "x": 195,
+      "y": 638,
+      "disabled": false,
+      "background": [
+        237,
+        240,
+        225
+      ],
+      "ratio": 10.63
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "selector": "P",
+      "text": "Try “list devices” or “turn on living room”.",
+      "foreground": [
+        82,
+        102,
+        91
+      ],
+      "x": 195,
+      "y": 678.59375,
+      "disabled": false,
+      "background": [
+        237,
+        240,
+        226
+      ],
+      "ratio": 5.33
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "selector": "P",
+      "text": "Living room and bedroom are available as mock lights.",
+      "foreground": [
+        82,
+        102,
+        91
+      ],
+      "x": 195,
+      "y": 730.59375,
+      "disabled": false,
+      "background": [
+        238,
+        241,
+        227
+      ],
+      "ratio": 5.37
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "selector": "LABEL",
+      "text": "Message Aura",
+      "foreground": [
+        23,
+        59,
+        50
+      ],
+      "x": 195,
+      "y": 943,
+      "disabled": false,
+      "background": [
+        254,
+        254,
+        253
+      ],
+      "ratio": 12.18
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "selector": "message",
+      "text": "",
+      "foreground": [
+        23,
+        59,
+        50
+      ],
+      "x": 154.9765625,
+      "y": 992,
+      "disabled": false,
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 12.29
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "selector": "BUTTON",
+      "text": "Send",
+      "foreground": [
+        255,
+        255,
+        255
+      ],
+      "x": 316.9765625,
+      "y": 992,
+      "disabled": false,
+      "background": [
+        36,
+        92,
+        70
+      ],
+      "ratio": 7.79
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "selector": "H2",
+      "text": "Approved preferences",
+      "foreground": [
+        23,
+        59,
+        50
+      ],
+      "x": 195,
+      "y": 1095,
+      "disabled": false,
+      "background": [
+        254,
+        254,
+        254
+      ],
+      "ratio": 12.19
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "selector": "action-danger emergency-stop",
+      "text": "Emergency stop all automations",
+      "foreground": [
+        161,
+        45,
+        50
+      ],
+      "x": 195,
+      "y": 1872,
+      "disabled": false,
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 7.15
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "selector": "voice-phase",
+      "text": "Voice: idle",
+      "foreground": [
+        23,
+        59,
+        50
+      ],
+      "x": 195,
+      "y": 3052.5,
+      "disabled": false,
+      "background": [
+        232,
+        238,
+        231
+      ],
+      "ratio": 10.43
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "selector": "SMALL",
+      "text": "Discard sends nothing. Stop playback only stops the speaker.",
+      "foreground": [
+        82,
+        102,
+        91
+      ],
+      "x": 195,
+      "y": 3202,
+      "disabled": false,
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 6.16
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "text",
+      "foreground": [
+        23,
+        59,
+        50
+      ],
+      "background": [
+        224,
+        224,
+        224
+      ],
+      "ratio": 9.31
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "text-muted",
+      "foreground": [
+        82,
+        102,
+        91
+      ],
+      "background": [
+        224,
+        224,
+        224
+      ],
+      "ratio": 4.66
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "border-control",
+      "foreground": [
+        107,
+        126,
+        113
+      ],
+      "background": [
+        224,
+        224,
+        224
+      ],
+      "ratio": 3.28
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "focus",
+      "foreground": [
+        120,
+        85,
+        26
+      ],
+      "background": [
+        224,
+        224,
+        224
+      ],
+      "ratio": 5.11
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "success",
+      "foreground": [
+        36,
+        92,
+        70
+      ],
+      "background": [
+        224,
+        224,
+        224
+      ],
+      "ratio": 5.9
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "warning",
+      "foreground": [
+        119,
+        80,
+        11
+      ],
+      "background": [
+        224,
+        224,
+        224
+      ],
+      "ratio": 5.42
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "danger",
+      "foreground": [
+        161,
+        45,
+        50
+      ],
+      "background": [
+        224,
+        224,
+        224
+      ],
+      "ratio": 5.42
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "text",
+      "foreground": [
+        23,
+        59,
+        50
+      ],
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 12.29
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "text-muted",
+      "foreground": [
+        82,
+        102,
+        91
+      ],
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 6.16
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "border-control",
+      "foreground": [
+        107,
+        126,
+        113
+      ],
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 4.33
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "focus",
+      "foreground": [
+        120,
+        85,
+        26
+      ],
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 6.75
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "success",
+      "foreground": [
+        36,
+        92,
+        70
+      ],
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 7.79
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "warning",
+      "foreground": [
+        119,
+        80,
+        11
+      ],
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 7.15
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "danger",
+      "foreground": [
+        161,
+        45,
+        50
+      ],
+      "background": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 7.15
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "selector": "eyebrow",
+      "text": "HOME INTELLIGENCE",
+      "foreground": [
+        180,
+        198,
+        184
+      ],
+      "x": 231,
+      "y": 56.5,
+      "disabled": false,
+      "background": [
+        22,
+        38,
+        30
+      ],
+      "ratio": 8.8
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "selector": "H1",
+      "text": "Aura",
+      "foreground": [
+        237,
+        244,
+        237
+      ],
+      "x": 231,
+      "y": 105,
+      "disabled": false,
+      "background": [
+        21,
+        39,
+        31
+      ],
+      "ratio": 13.98
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "selector": "status",
+      "text": "Connected · mock agent · simulated devices",
+      "foreground": [
+        237,
+        244,
+        237
+      ],
+      "x": 195,
+      "y": 216.5,
+      "disabled": false,
+      "background": [
+        39,
+        57,
+        46
+      ],
+      "ratio": 10.97
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "selector": "H2",
+      "text": "Lights",
+      "foreground": [
+        237,
+        244,
+        237
+      ],
+      "x": 61.4609375,
+      "y": 310,
+      "disabled": false,
+      "background": [
+        27,
+        40,
+        32
+      ],
+      "ratio": 13.69
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "selector": "device-state",
+      "text": "off",
+      "foreground": [
+        180,
+        198,
+        184
+      ],
+      "x": 142.5898895263672,
+      "y": 472,
+      "disabled": false,
+      "background": [
+        27,
+        40,
+        32
+      ],
+      "ratio": 8.54
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "selector": "SMALL",
+      "text": "Observed 10/10/2026, 5:37:16 PM",
+      "foreground": [
+        180,
+        198,
+        184
+      ],
+      "x": 195,
+      "y": 502.5,
+      "disabled": false,
+      "background": [
+        27,
+        40,
+        32
+      ],
+      "ratio": 8.54
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "selector": "H2",
+      "text": "Start with a light.",
+      "foreground": [
+        237,
+        244,
+        237
+      ],
+      "x": 195,
+      "y": 638,
+      "disabled": false,
+      "background": [
+        30,
+        38,
+        27
+      ],
+      "ratio": 13.92
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "selector": "P",
+      "text": "Try “list devices” or “turn on living room”.",
+      "foreground": [
+        180,
+        198,
+        184
+      ],
+      "x": 195,
+      "y": 678.59375,
+      "disabled": false,
+      "background": [
+        29,
+        38,
+        27
+      ],
+      "ratio": 8.7
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "selector": "P",
+      "text": "Living room and bedroom are available as mock lights.",
+      "foreground": [
+        180,
+        198,
+        184
+      ],
+      "x": 195,
+      "y": 730.59375,
+      "disabled": false,
+      "background": [
+        28,
+        36,
+        26
+      ],
+      "ratio": 8.89
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "selector": "LABEL",
+      "text": "Message Aura",
+      "foreground": [
+        237,
+        244,
+        237
+      ],
+      "x": 195,
+      "y": 943,
+      "disabled": false,
+      "background": [
+        26,
+        39,
+        31
+      ],
+      "ratio": 13.86
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "selector": "message",
+      "text": "",
+      "foreground": [
+        237,
+        244,
+        237
+      ],
+      "x": 154.9765625,
+      "y": 992,
+      "disabled": false,
+      "background": [
+        27,
+        40,
+        32
+      ],
+      "ratio": 13.69
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "selector": "BUTTON",
+      "text": "Send",
+      "foreground": [
+        19,
+        39,
+        27
+      ],
+      "x": 316.9765625,
+      "y": 992,
+      "disabled": false,
+      "background": [
+        183,
+        215,
+        184
+      ],
+      "ratio": 10.07
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "selector": "H2",
+      "text": "Approved preferences",
+      "foreground": [
+        237,
+        244,
+        237
+      ],
+      "x": 195,
+      "y": 1095,
+      "disabled": false,
+      "background": [
+        27,
+        40,
+        32
+      ],
+      "ratio": 13.69
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "selector": "action-danger emergency-stop",
+      "text": "Emergency stop all automations",
+      "foreground": [
+        255,
+        179,
+        181
+      ],
+      "x": 195,
+      "y": 1872,
+      "disabled": false,
+      "background": [
+        27,
+        40,
+        32
+      ],
+      "ratio": 9.02
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "selector": "voice-phase",
+      "text": "Voice: idle",
+      "foreground": [
+        237,
+        244,
+        237
+      ],
+      "x": 195,
+      "y": 3052.5,
+      "disabled": false,
+      "background": [
+        39,
+        57,
+        46
+      ],
+      "ratio": 10.97
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "selector": "SMALL",
+      "text": "Discard sends nothing. Stop playback only stops the speaker.",
+      "foreground": [
+        180,
+        198,
+        184
+      ],
+      "x": 195,
+      "y": 3202,
+      "disabled": false,
+      "background": [
+        27,
+        40,
+        32
+      ],
+      "ratio": 8.54
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "text",
+      "foreground": [
+        237,
+        244,
+        237
+      ],
+      "background": [
+        53,
+        64,
+        57
+      ],
+      "ratio": 9.65
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "text-muted",
+      "foreground": [
+        180,
+        198,
+        184
+      ],
+      "background": [
+        53,
+        64,
+        57
+      ],
+      "ratio": 6.02
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "border-control",
+      "foreground": [
+        127,
+        149,
+        134
+      ],
+      "background": [
+        25,
+        38,
+        30
+      ],
+      "ratio": 4.89
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "focus",
+      "foreground": [
+        241,
+        199,
+        119
+      ],
+      "background": [
+        25,
+        38,
+        30
+      ],
+      "ratio": 9.85
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "success",
+      "foreground": [
+        183,
+        215,
+        184
+      ],
+      "background": [
+        53,
+        64,
+        57
+      ],
+      "ratio": 6.91
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "warning",
+      "foreground": [
+        241,
+        199,
+        119
+      ],
+      "background": [
+        53,
+        64,
+        57
+      ],
+      "ratio": 6.78
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "black",
+      "token": "danger",
+      "foreground": [
+        255,
+        179,
+        181
+      ],
+      "background": [
+        53,
+        64,
+        57
+      ],
+      "ratio": 6.36
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "text",
+      "foreground": [
+        237,
+        244,
+        237
+      ],
+      "background": [
+        66,
+        77,
+        70
+      ],
+      "ratio": 7.88
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "text-muted",
+      "foreground": [
+        180,
+        198,
+        184
+      ],
+      "background": [
+        66,
+        77,
+        70
+      ],
+      "ratio": 4.92
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "border-control",
+      "foreground": [
+        127,
+        149,
+        134
+      ],
+      "background": [
+        40,
+        53,
+        45
+      ],
+      "ratio": 4
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "focus",
+      "foreground": [
+        241,
+        199,
+        119
+      ],
+      "background": [
+        40,
+        53,
+        45
+      ],
+      "ratio": 8.05
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "success",
+      "foreground": [
+        183,
+        215,
+        184
+      ],
+      "background": [
+        66,
+        77,
+        70
+      ],
+      "ratio": 5.64
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "warning",
+      "foreground": [
+        241,
+        199,
+        119
+      ],
+      "background": [
+        66,
+        77,
+        70
+      ],
+      "ratio": 5.53
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "surface": "glass stress",
+      "backdrop": "white",
+      "token": "danger",
+      "foreground": [
+        255,
+        179,
+        181
+      ],
+      "background": [
+        66,
+        77,
+        70
+      ],
+      "ratio": 5.19
+    }
+  ],
+  "engines": [
+    {
+      "engine": "chromium",
+      "version": "156.0.8078.4"
+    },
+    {
+      "engine": "webkit",
+      "version": "27.2"
+    }
+  ],
+  "performance": [
+    {
+      "engine": "chromium",
+      "opaque": false,
+      "paintCount": 1241,
+      "paintMs": 294.01,
+      "streamDeltas": 600,
+      "frameCount": 654,
+      "p95FrameMs": 17.8,
+      "maxFrameMs": 21.2,
+      "framesOver50ms": 0,
+      "longTasks": [],
+      "metrics": {
+        "Timestamp": 10.633121999999275,
+        "LayoutCount": 600,
+        "RecalcStyleCount": 8,
+        "LayoutDuration": 1.2244,
+        "RecalcStyleDuration": 0.000453,
+        "ScriptDuration": 1.057019,
+        "TaskDuration": 3.089316
+      }
+    },
+    {
+      "engine": "chromium",
+      "opaque": true,
+      "paintCount": 1246,
+      "paintMs": 338.5,
+      "streamDeltas": 600,
+      "frameCount": 660,
+      "p95FrameMs": 17.9,
+      "maxFrameMs": 20.7,
+      "framesOver50ms": 0,
+      "longTasks": [],
+      "metrics": {
+        "Timestamp": 10.73616800000309,
+        "LayoutCount": 600,
+        "RecalcStyleCount": 11,
+        "LayoutDuration": 1.305097,
+        "RecalcStyleDuration": 0.000546,
+        "ScriptDuration": 1.139274,
+        "TaskDuration": 3.326365
+      }
+    }
+  ]
+}

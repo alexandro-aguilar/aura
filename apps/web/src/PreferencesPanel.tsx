@@ -56,7 +56,12 @@ export function PreferencesPanel() {
     }
   }
   return (
-    <aside className="settings-panel" aria-label="Approved preferences">
+    <aside
+      className="settings-panel preferences-panel"
+      aria-label="Approved preferences"
+      data-enabled={enabled}
+      data-busy={busy}
+    >
       <h2>Approved preferences</h2>
       <p>
         {enabled
@@ -76,6 +81,7 @@ export function PreferencesPanel() {
                 ` · conversation ${entry.sourceConversationId}`}
             </small>
             <button
+              className="action-danger"
               type="button"
               disabled={busy}
               onClick={() => void mutate(entry.id)}

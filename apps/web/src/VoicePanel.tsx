@@ -189,7 +189,7 @@ export function VoicePanel(props: {
     settle();
   }
   return (
-    <aside className="voice-panel" aria-label="Voice">
+    <aside className="voice-panel" aria-label="Voice" data-phase={phase}>
       <h2>Talk to Aura</h2>
       <p>
         Start recording, speak, then send. Recording stops after 20 seconds.
@@ -199,7 +199,7 @@ export function VoicePanel(props: {
           ? 'Mock speech: recordings produce “status” and a reply tone.'
           : 'Voice replies are AI-generated. Audio is sent to the configured speech provider.'}
       </p>
-      <p role="status" aria-live="polite">
+      <p className="voice-phase" role="status" aria-live="polite">
         Voice: {phase}
       </p>
       <div className="voice-actions">
@@ -218,12 +218,13 @@ export function VoicePanel(props: {
           </button>
         )}
         {['permission', 'recording'].includes(phase) && (
-          <button type="button" onClick={discard}>
+          <button className="action-secondary" type="button" onClick={discard}>
             Discard recording
           </button>
         )}
         {phase === 'playback' && (
           <button
+            className="action-secondary"
             type="button"
             onClick={() => {
               clearAudio();
@@ -236,6 +237,7 @@ export function VoicePanel(props: {
         )}
         {replay && (
           <button
+            className="action-secondary"
             type="button"
             onClick={() => void play()}
             disabled={props.disabled}

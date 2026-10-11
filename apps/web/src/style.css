@@ -1,183 +1,572 @@
-:root {
-  font-family: system-ui, sans-serif;
-  color: #173b32;
-  background: #f4f5ef;
-  font-synthesis: none;
-}
-* {
-  box-sizing: border-box;
-}
-body {
-  margin: 0;
-}
-main {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 3rem 1.5rem;
-}
-h1 {
-  font-size: 4rem;
-  letter-spacing: -0.07em;
-  margin: 0.2rem 0;
-}
-header > p {
-  color: #53695f;
-}
-.eyebrow {
-  font-size: 0.75rem;
-  letter-spacing: 0.16em;
-}
-.status {
-  font-size: 0.85rem;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid #ccd6cc;
-}
-section {
-  min-height: 300px;
-}
-.conversation {
-  min-height: min(300px, 50vh);
-  max-height: 50vh;
-  overflow-y: auto;
-}
-.welcome {
-  padding: 2rem 0;
-}
-article {
-  background: white;
-  border: 1px solid #dbe0d6;
-  border-radius: 1rem;
-  padding: 1rem 1.25rem;
-  margin: 1rem 0;
-}
-article.user {
-  background: #e2ece2;
-  margin-left: 2rem;
-}
-article p {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-}
-.composer {
-  display: flex;
-  gap: 0.5rem;
-}
-input {
-  flex: 1;
-  min-width: 0;
-  border: 1px solid #b0c0b1;
-  border-radius: 0.75rem;
-  padding: 1rem;
-  font: inherit;
-}
-button {
-  background: #173b32;
-  color: white;
-  border: 0;
-  border-radius: 0.75rem;
-  padding: 1rem;
-  font: inherit;
-  cursor: pointer;
-}
-button:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-:focus-visible {
-  outline: 3px solid #b58535;
-  outline-offset: 3px;
-}
-.error {
-  color: #9c2929;
-}
-.device-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-.devices {
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #ccd6cc;
-}
-.devices ul {
-  padding-left: 1.25rem;
-}
-.devices li {
-  margin: 0.75rem 0;
-}
-.devices small {
-  display: block;
-  color: #53695f;
-}
-.light-controls {
-  display: flex;
-  gap: 0.5rem;
-  margin: 0.5rem 0;
-}
-.light-controls button {
-  padding: 0.5rem 1rem;
+@layer tokens, base, components, materials, accessibility;
+
+@import './styles/tokens.css';
+@import './styles/base.css';
+@import './styles/materials.css';
+
+/* Component layout and states consume the shared tokens and materials. */
+@layer components {
+  .aura-app {
+    display: grid;
+    gap: var(--aura-space-6);
+    max-width: var(--aura-content-max-width);
+    margin: 0 auto;
+    padding: var(--aura-space-6) var(--aura-space-4);
+    overflow-wrap: anywhere;
+  }
+  .aura-app > * {
+    min-width: 0;
+  }
+  .aura-app > header {
+    align-self: center;
+    padding: var(--aura-space-4) 0;
+  }
+  .dashboard-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--aura-space-1);
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto var(--aura-space-4);
+    padding: var(--aura-space-2);
+    border: var(--aura-border-width) solid var(--aura-glass-edge);
+    border-radius: var(--aura-radius-pill);
+    background: var(--aura-surface-content);
+  }
+  .dashboard-nav a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--aura-control-min-size);
+    padding: var(--aura-space-2) var(--aura-space-3);
+    border-radius: var(--aura-radius-pill);
+    text-decoration: none;
+    color: var(--aura-text);
+    font-size: var(--aura-text-small);
+  }
+  .dashboard-nav .nav-brand {
+    background: var(--aura-surface-content);
+    gap: var(--aura-space-2);
+  }
+  .dashboard-nav a:hover {
+    background: var(--aura-surface-subtle);
+  }
+  .nav-brand span {
+    font-size: var(--aura-text-heading);
+    color: var(--aura-accent);
+  }
+  .home-scene {
+    position: relative;
+    min-height: 20rem;
+    border-radius: var(--aura-radius-panel);
+    overflow: hidden;
+    background:
+      linear-gradient(0deg, rgb(0 0 0 / 85%), transparent 85%),
+      url('/images/home-interior.jpg') center / cover;
+    border: var(--aura-border-width) solid var(--aura-glass-edge);
+    box-shadow: var(--aura-shadow-glass);
+  }
+  .scene-caption {
+    position: absolute;
+    inset: auto var(--aura-space-6) var(--aura-space-6);
+  }
+  .scene-caption h2 {
+    font-size: 1.8rem;
+    font-weight: var(--aura-weight-medium);
+    line-height: var(--aura-leading-heading);
+    margin-block: var(--aura-space-3);
+  }
+  .scene-caption p {
+    margin-bottom: 0;
+    color: var(--aura-text-muted);
+  }
+  .scene-badge {
+    position: absolute;
+    inset: var(--aura-space-4) auto auto var(--aura-space-4);
+    background: var(--aura-surface-content);
+    padding: var(--aura-space-2) var(--aura-space-3);
+    border-radius: var(--aura-radius-pill);
+    font-size: var(--aura-text-small);
+  }
+  .dashboard-chat {
+    padding: var(--aura-space-6);
+    border: var(--aura-border-width) solid var(--aura-border);
+    border-radius: var(--aura-radius-panel);
+    background: var(--aura-surface-content);
+  }
+  .chat-heading h2 {
+    font-size: 1.8rem;
+    font-weight: var(--aura-weight-medium);
+    margin: var(--aura-space-2) 0;
+    letter-spacing: var(--aura-tracking-title);
+  }
+  .dashboard-settings {
+    display: grid;
+    align-items: start;
+    gap: var(--aura-space-6);
+  }
+  .dashboard-voice .voice-panel {
+    height: 100%;
+  }
+  .dashboard-settings,
+  .dashboard-voice,
+  #conversation,
+  #lights {
+    scroll-margin-top: var(--aura-space-6);
+  }
+  @media (min-width: 64rem) {
+    .aura-app {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+    .dashboard-nav {
+      grid-column: 1 / -1;
+    }
+    .aura-app > header,
+    .home-scene,
+    .devices {
+      grid-column: span 4;
+    }
+    .dashboard-chat {
+      grid-column: span 8;
+    }
+    .dashboard-voice {
+      grid-column: span 4;
+    }
+    .dashboard-settings {
+      grid-column: 1 / -1;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .aura-app > header h1 {
+    font-size: var(--aura-text-title);
+    font-weight: var(--aura-weight-normal);
+    letter-spacing: var(--aura-tracking-title);
+    line-height: var(--aura-leading-heading);
+    margin: var(--aura-space-4) 0;
+  }
+  .aura-app > header > p {
+    color: var(--aura-text-muted);
+  }
+  .eyebrow {
+    font-size: var(--aura-text-small);
+    letter-spacing: var(--aura-tracking-eyebrow);
+    font-weight: var(--aura-weight-medium);
+  }
+  .status {
+    display: flex;
+    align-items: baseline;
+    gap: var(--aura-space-2);
+    font-size: var(--aura-text-small);
+    margin-block: var(--aura-space-6) 0;
+    color: var(--aura-text-muted);
+  }
+  .status::before {
+    content: '';
+    flex: 0 0 var(--aura-space-2);
+    height: var(--aura-space-2);
+    background: currentColor;
+    border-radius: var(--aura-radius-pill);
+  }
+  .status[data-connection='connecting'],
+  .status[data-connection='disconnected'] {
+    color: var(--aura-warning);
+  }
+  .conversation {
+    min-height: min(11rem, 40vh);
+    max-height: 50vh;
+    min-height: min(11rem, 40dvh);
+    max-height: 50dvh;
+    overflow-y: auto;
+    padding: var(--aura-space-2);
+    margin-block: var(--aura-space-6) var(--aura-space-4);
+    scroll-padding: var(--aura-space-2);
+  }
+  .welcome {
+    padding: var(--aura-space-6) var(--aura-space-2);
+  }
+  .welcome h2 {
+    font-size: var(--aura-text-heading);
+    line-height: var(--aura-leading-heading);
+    font-weight: var(--aura-weight-bold);
+    margin-top: 0;
+  }
+  .welcome p {
+    color: var(--aura-text-muted);
+  }
+  .conversation > article {
+    background: var(--aura-surface-content);
+    border: var(--aura-border-width) solid var(--aura-border);
+    border-radius: var(--aura-radius-message);
+    padding: var(--aura-space-4) var(--aura-space-5);
+    margin: 0 0 var(--aura-space-4);
+  }
+  .conversation > article > strong {
+    font-size: var(--aura-text-small);
+    font-weight: var(--aura-weight-bold);
+    color: var(--aura-text-muted);
+  }
+  .conversation > article.user {
+    background: var(--aura-surface-subtle);
+    margin-inline-start: var(--aura-space-4);
+  }
+  .conversation > article.assistant {
+    margin-inline-end: var(--aura-space-4);
+  }
+  .conversation > article p {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    margin-block: var(--aura-space-2) 0;
+  }
+  .chat-form {
+    padding: var(--aura-space-4) 0 0;
+    border-top: var(--aura-border-width) solid var(--aura-border);
+    scroll-margin-block: var(--aura-space-4);
+  }
+  .chat-form[data-busy='true'] > label {
+    color: var(--aura-text-muted);
+  }
+  .chat-progress {
+    font-size: var(--aura-text-small);
+    color: var(--aura-text-muted);
+    margin: var(--aura-space-2) var(--aura-space-4);
+  }
+  .aura-app > .chat-error {
+    background: var(--aura-surface-content);
+    border: var(--aura-border-width) solid var(--aura-danger);
+    border-radius: var(--aura-radius-control);
+    padding: var(--aura-space-4);
+    margin-block: var(--aura-space-4) var(--aura-space-6);
+  }
+  :where(.chat-form, .settings-panel) label {
+    display: block;
+    margin-bottom: var(--aura-space-2);
+    font-weight: var(--aura-weight-bold);
+  }
+  .composer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--aura-space-2);
+  }
+  .composer input {
+    flex: 1 1 10rem;
+    padding: var(--aura-space-4);
+  }
+  .composer button {
+    flex: 0 0 auto;
+  }
+  .composer input,
+  .composer button {
+    transition:
+      background-color var(--aura-duration-fast) var(--aura-ease),
+      border-color var(--aura-duration-fast) var(--aura-ease);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .composer button:enabled:hover {
+      background: var(--aura-accent-hover);
+    }
+    .composer input:enabled:hover {
+      border-color: var(--aura-accent);
+    }
+  }
+  .composer button:enabled:active {
+    background: var(--aura-accent-pressed);
+  }
+  @media (min-width: 48rem) {
+    .aura-app {
+      padding: var(--aura-space-12) var(--aura-space-6);
+    }
+    .conversation > article.user {
+      margin-inline-start: var(--aura-space-8);
+    }
+    .conversation > article.assistant {
+      margin-inline-end: var(--aura-space-8);
+    }
+  }
+  .aura-app .error {
+    color: var(--aura-danger);
+  }
+  :where(.devices, .voice-panel, .settings-panel) {
+    margin: 0;
+    padding: var(--aura-space-6);
+    border: var(--aura-border-width) solid var(--aura-border);
+    border-radius: var(--aura-radius-panel);
+    background: var(--aura-surface-content);
+    min-width: 0;
+    box-shadow: var(--aura-shadow-panel);
+  }
+
+  :where(.devices, .voice-panel, .settings-panel) h2 {
+    margin-block: 0 var(--aura-space-4);
+    font-size: var(--aura-text-heading);
+    font-weight: var(--aura-weight-bold);
+    line-height: var(--aura-leading-heading);
+  }
+
+  :where(.devices, .voice-panel, .settings-panel) h3 {
+    font-size: var(--aura-text-body);
+    font-weight: var(--aura-weight-bold);
+  }
+
+  :where(.devices, .voice-panel, .settings-panel) small {
+    display: block;
+    margin-block: var(--aura-space-2);
+    color: var(--aura-text-muted);
+    font-size: var(--aura-text-small);
+    line-height: var(--aura-leading-body);
+  }
+
+  :where(.devices, .voice-panel, .settings-panel) button {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    transition:
+      background-color var(--aura-duration-fast) var(--aura-ease),
+      border-color var(--aura-duration-fast) var(--aura-ease);
+  }
+
+  :where(.devices, .voice-panel, .settings-panel)
+    :is(.action-secondary, .light-controls button) {
+    background: var(--aura-surface-content);
+    color: var(--aura-text);
+    border-color: var(--aura-border-control);
+  }
+
+  :where(.devices, .voice-panel, .settings-panel) .action-danger {
+    background: var(--aura-surface-content);
+    color: var(--aura-danger);
+    border-color: var(--aura-danger);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    :where(.devices, .voice-panel, .settings-panel) button:enabled:hover {
+      background: var(--aura-accent-hover);
+    }
+    :where(.devices, .voice-panel, .settings-panel)
+      :is(
+        .action-secondary,
+        .action-danger,
+        .light-controls button
+      ):enabled:hover {
+      background: var(--aura-surface-subtle);
+    }
+  }
+
+  :where(.devices, .voice-panel, .settings-panel) button:enabled:active {
+    background: var(--aura-accent-pressed);
+  }
+
+  :where(.devices, .voice-panel, .settings-panel)
+    :is(
+      .action-secondary,
+      .action-danger,
+      .light-controls button
+    ):enabled:active {
+    background: var(--aura-surface-subtle);
+    box-shadow: inset 0 0 0 var(--aura-border-width) currentColor;
+  }
+
+  /* Component variants must retain the shared disabled treatment. */
+  :where(.devices, .voice-panel, .settings-panel) button:disabled {
+    background: var(--aura-surface-subtle);
+    color: var(--aura-disabled-text);
+    border-color: var(--aura-border-control);
+  }
+
+  .device-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--aura-space-4);
+  }
+  .device-heading h2 {
+    margin: 0;
+  }
+  .device-list,
+  .settings-panel ul {
+    list-style: none;
+    padding: 0;
+    margin-block: var(--aura-space-4);
+  }
+  .device-list > li,
+  .settings-panel li {
+    padding-block: var(--aura-space-4);
+    border-top: var(--aura-border-width) solid var(--aura-border);
+    overflow-wrap: anywhere;
+  }
+  .device-state {
+    font-weight: var(--aura-weight-medium);
+  }
+  .device-list [data-state='off'] .device-state {
+    color: var(--aura-text-muted);
+  }
+  .device-list
+    :is([data-state='unknown'], [data-state='unavailable'])
+    .device-state {
+    color: var(--aura-warning);
+  }
+  .device-list [data-busy='true'] .device-state {
+    color: var(--aura-text-muted);
+  }
+  .light-controls,
+  .voice-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--aura-space-2);
+    margin-block: var(--aura-space-3);
+  }
+  .light-controls button {
+    padding: var(--aura-space-2) var(--aura-space-4);
+  }
+
+  .panel-notice,
+  .control-audit,
+  .voice-phase {
+    padding: var(--aura-space-3) var(--aura-space-4);
+    background: var(--aura-surface-subtle);
+    border: var(--aura-border-width) solid var(--aura-border);
+    border-radius: var(--aura-radius-control);
+  }
+  .control-audit h3 {
+    margin-top: 0;
+  }
+  .control-audit p:last-child {
+    margin-bottom: 0;
+  }
+  :where(.control-audit, .automation-receipts) [data-outcome='succeeded'] {
+    color: var(--aura-success);
+  }
+  :where(.control-audit, .automation-receipts)
+    :is(
+      [data-outcome='pending'],
+      [data-outcome='denied'],
+      [data-outcome='uncertain']
+    ) {
+    color: var(--aura-warning);
+  }
+  :where(.control-audit, .automation-receipts) [data-outcome='failed'] {
+    color: var(--aura-danger);
+  }
+
+  :where(.devices, .voice-panel, .settings-panel) .error {
+    padding: var(--aura-space-4);
+    border: var(--aura-border-width) solid var(--aura-danger);
+    border-radius: var(--aura-radius-control);
+    background: var(--aura-surface-content);
+  }
+  .voice-panel h2 {
+    color: var(--aura-accent);
+  }
+  .voice-phase {
+    display: flex;
+    align-items: baseline;
+    gap: var(--aura-space-2);
+    font-size: var(--aura-text-small);
+  }
+  .voice-phase::before {
+    content: '';
+    flex: 0 0 var(--aura-space-2);
+    height: var(--aura-space-2);
+    border: var(--aura-border-width) solid currentColor;
+    border-radius: var(--aura-radius-pill);
+  }
+  .voice-panel[data-phase='recording'] .voice-phase,
+  .voice-panel[data-phase='error'] .voice-phase {
+    color: var(--aura-danger);
+  }
+  .voice-panel[data-phase='recording'] .voice-phase::before {
+    background: currentColor;
+  }
+  .voice-panel[data-phase='playback'] .voice-phase {
+    color: var(--aura-accent);
+  }
+  .devices[data-read-only='true'] > p:not(.error, .panel-notice),
+  .preferences-panel[data-enabled='false'] > p:first-of-type {
+    color: var(--aura-text-muted);
+  }
+  .automations-panel:is([data-available='false'], [data-enabled='false'])
+    > p:first-of-type {
+    color: var(--aura-warning);
+  }
+  .voice-panel:is(
+      [data-phase='permission'],
+      [data-phase='transcribing'],
+      [data-phase='responding'],
+      [data-phase='synthesizing']
+    )
+    .voice-phase {
+    color: var(--aura-warning);
+  }
+  .voice-inspection {
+    overflow-wrap: anywhere;
+    font-size: var(--aura-text-small);
+  }
+
+  .settings-panel form {
+    display: grid;
+    gap: var(--aura-space-2);
+    margin-block: var(--aura-space-6);
+    min-width: 0;
+  }
+  .settings-panel form > label:not(.consent) {
+    margin: 0;
+  }
+  /* WebKit's native popup ignores min-height; an explicit height keeps it usable. */
+  .settings-panel select {
+    height: calc(
+      1rem * var(--aura-leading-body) + 2 * var(--aura-space-3) + 2 *
+        var(--aura-border-width)
+    );
+  }
+
+  .settings-panel select,
+  .settings-panel input:not([type='checkbox']) {
+    width: 100%;
+    padding: var(--aura-space-3);
+  }
+  .settings-panel li > button {
+    margin-block-start: var(--aura-space-2);
+    margin-inline-end: var(--aura-space-2);
+  }
+  .settings-panel .consent {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--aura-space-2);
+    min-height: var(--aura-control-min-size);
+    margin-block: var(--aura-space-4);
+    font-weight: var(--aura-weight-normal);
+  }
+  .settings-panel .consent input {
+    flex: 0 0 auto;
+    margin: var(--aura-space-1) 0 0;
+  }
+  .emergency-stop {
+    width: 100%;
+    font-weight: var(--aura-weight-bold);
+  }
+  @media (min-width: 48rem) {
+    :where(.devices, .voice-panel, .settings-panel) {
+      padding: var(--aura-space-6);
+    }
+  }
 }
 
-.voice-panel {
-  margin: 1.5rem 0;
-  padding: 1.25rem;
-  border: 1px solid #b0c0b1;
-  border-radius: 1rem;
-  background: #eaf0e6;
-}
-.voice-panel h2 {
-  margin-top: 0;
-}
-.voice-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 1rem 0;
-}
-.voice-inspection {
-  overflow-wrap: anywhere;
-  font-size: 0.85rem;
-}
-.voice-panel small {
-  display: block;
-  line-height: 1.5;
-}
-
-.settings-panel {
-  margin-top: 1.5rem;
-  padding: 1rem;
-  border: 1px solid #526578;
-  border-radius: 0.7rem;
-}
-.settings-panel form {
-  display: grid;
-  gap: 0.5rem;
-  margin: 1rem 0;
-}
-.settings-panel select,
-.settings-panel input:not([type='checkbox']) {
-  padding: 0.5rem;
-  font: inherit;
-  max-width: 100%;
-}
-.settings-panel small {
-  display: block;
-  margin: 0.4rem 0;
-}
-.settings-panel li {
-  margin-bottom: 1rem;
-  overflow-wrap: anywhere;
-}
-.settings-panel button {
-  margin: 0.3rem;
-}
-.settings-panel .consent {
-  display: block;
-  margin: 1rem 0;
+@layer accessibility {
+  @media (prefers-reduced-transparency: reduce),
+    (prefers-contrast: more),
+    (forced-colors: active) {
+    .home-scene {
+      background: var(--aura-surface-content);
+    }
+  }
+  @media (forced-colors: active) {
+    .dashboard-nav a {
+      color: LinkText;
+    }
+    .dashboard-nav .nav-brand,
+    .scene-badge {
+      background: Canvas;
+    }
+  }
 }

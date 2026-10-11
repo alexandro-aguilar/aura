@@ -1,0 +1,107 @@
+@layer tokens {
+  :root {
+    color-scheme: dark;
+
+    --aura-canvas: #151815;
+    --aura-canvas-glow: #c4decd;
+    --aura-canvas-halo: #e2e7c5;
+    --aura-glass-edge: rgb(255 255 255 / 35%);
+    --aura-brand-glow: #8fbfa4;
+    --aura-shadow-panel: 0 18px 48px rgb(0 0 0 / 24%);
+    --aura-surface-content: #252c28;
+    --aura-surface-subtle: #323c36;
+    --aura-surface-overlay: #252c28;
+    --aura-glass-tint: rgb(255 255 255 / 8%);
+    --aura-text: #ffffff;
+    --aura-text-muted: #e2e2de;
+    --aura-accent: #c8eed5;
+    --aura-on-accent: #112e20;
+    --aura-accent-hover: #def7e6;
+    --aura-accent-pressed: #afd9bf;
+    --aura-border: rgb(255 255 255 / 22%);
+    --aura-border-control: #b9c5be;
+    --aura-highlight: rgb(255 255 255 / 30%);
+    --aura-focus: #f5d394;
+    --aura-success: #c8eed5;
+    --aura-warning: #f5d394;
+    --aura-danger: #ffb9b9;
+    --aura-disabled-text: #c8d0ca;
+
+    --aura-font-body:
+      system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --aura-font-mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+    --aura-text-small: 0.875rem;
+    --aura-text-body: 1rem;
+    --aura-text-heading: 1.25rem;
+    --aura-text-title: clamp(3rem, 5vw, 4.5rem);
+    --aura-leading-body: 1.5;
+    --aura-leading-heading: 1.2;
+    --aura-weight-normal: 400;
+    --aura-weight-medium: 500;
+    --aura-weight-bold: 600;
+    --aura-tracking-title: -0.04em;
+    --aura-tracking-eyebrow: 0.12em;
+
+    --aura-space-1: 0.25rem;
+    --aura-space-2: 0.5rem;
+    --aura-space-3: 0.75rem;
+    --aura-space-4: 1rem;
+    --aura-space-5: 1.25rem;
+    --aura-space-6: 1.5rem;
+    --aura-space-8: 2rem;
+    --aura-space-12: 3rem;
+    --aura-radius-control: 1rem;
+    --aura-radius-message: 1rem;
+    --aura-radius-panel: 2rem;
+    --aura-radius-pill: 999px;
+    --aura-border-width: 1px;
+    --aura-focus-width: 3px;
+    --aura-focus-offset: 3px;
+    --aura-control-min-size: 44px;
+    --aura-content-max-width: 90rem;
+
+    --aura-glass-blur: 24px;
+    --aura-glass-saturation: 135%;
+    --aura-shadow-glass: 0 18px 48px rgb(0 0 0 / 24%);
+    --aura-shadow-overlay: 0 16px 40px rgb(23 59 50 / 16%);
+    --aura-duration-fast: 120ms;
+    --aura-duration-normal: 180ms;
+    --aura-ease: cubic-bezier(0.2, 0, 0, 1);
+  }
+}
+
+/* Keep user preferences above material and component rules in the cascade. */
+@layer accessibility {
+  @media (prefers-contrast: more) {
+    :root {
+      --aura-border: rgb(255 255 255 / 22%);
+    }
+  }
+
+  @media (forced-colors: active) {
+    :root {
+      --aura-canvas: #151815;
+      --aura-surface-content: #252c28;
+      --aura-surface-subtle: #323c36;
+      --aura-surface-overlay: #252c28;
+      --aura-glass-tint: rgb(255 255 255 / 8%);
+      --aura-text: #ffffff;
+      --aura-text-muted: #e2e2de;
+      --aura-accent: #c8eed5;
+      --aura-on-accent: #112e20;
+      --aura-accent-hover: #def7e6;
+      --aura-accent-pressed: #afd9bf;
+      --aura-border: rgb(255 255 255 / 22%);
+      --aura-border-control: #b9c5be;
+      --aura-highlight: rgb(255 255 255 / 30%);
+      --aura-focus: #f5d394;
+      --aura-success: #c8eed5;
+      --aura-warning: #f5d394;
+      --aura-danger: #ffb9b9;
+      --aura-disabled-text: #c8d0ca;
+      --aura-shadow-glass: 0 18px 48px rgb(0 0 0 / 24%);
+      --aura-shadow-panel: 0 18px 48px rgb(0 0 0 / 24%);
+      --aura-shadow-overlay: none;
+    }
+  }
+}

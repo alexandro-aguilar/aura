@@ -46,12 +46,22 @@ function App() {
   const controlInFlight = useRef(false);
   const conversationView = useRef<HTMLElement | null>(null);
   const composerView = useRef<HTMLFormElement | null>(null);
+  const pendingComposerScroll = useRef(false);
   useEffect(() => {
     const view = conversationView.current;
     if (view) view.scrollTop = view.scrollHeight;
-    if (lines.length > 0)
+    if (lines.length > 0) {
+      pendingComposerScroll.current = true;
       composerView.current?.scrollIntoView({ block: 'nearest' });
+    }
   }, [lines]);
+  useEffect(() => {
+    // A post-turn refresh restores device rows above chat after the first scroll.
+    if (pendingComposerScroll.current && !busy && !voiceBusy && !devicesBusy) {
+      composerView.current?.scrollIntoView({ block: 'nearest' });
+      pendingComposerScroll.current = false;
+    }
+  }, [lines, busy, voiceBusy, devicesBusy]);
   async function setLight(device: Device, state: 'on' | 'off') {
     if (controlInFlight.current) return;
     controlInFlight.current = true;
@@ -216,24 +226,61 @@ function App() {
     setError('');
   }
   return (
-    <main>
+    <main className="aura-app" id="home">
+      <nav className="dashboard-nav" aria-label="Dashboard">
+        <a className="nav-brand" href="#home" aria-label="Aura home">
+          <span aria-hidden="true">✳</span> Aura
+        </a>
+        <a href="#lights">Lights</a>
+        <a href="#conversation">Conversation</a>
+        <a href="#voice">Voice</a>
+        <a href="#settings">Settings</a>
+      </nav>
       <header>
         <p className="eyebrow">HOME INTELLIGENCE</p>
-        <h1>Aura</h1>
+        <h1>
+          Your home.
+          <br />
+          In harmony.
+        </h1>
         <p>Your home, one conversation away.</p>
+        <p
+          className="status"
+          data-connection={
+            status === 'Connected'
+              ? 'connected'
+              : status === 'Connecting…'
+                ? 'connecting'
+                : 'disconnected'
+          }
+        >
+          {status}
+          {mode && ` · ${mode} agent`}
+          {deviceBackend &&
+            (deviceBackend === 'home-assistant'
+              ? ' · Home Assistant'
+              : ' · simulated devices')}
+        </p>
       </header>
-      <p className="status">
-        {status}
-        {mode && ` · ${mode} agent`}
-        {deviceBackend &&
-          (deviceBackend === 'home-assistant'
-            ? ' · Home Assistant'
-            : ' · simulated devices')}
-      </p>
-      <aside aria-label="Devices" className="devices">
+      <section className="home-scene" aria-label="Home atmosphere">
+        <div className="scene-caption">
+          <span className="eyebrow">A SPACE TO EXHALE</span>
+          <h2>Make yourself at home.</h2>
+          <p>Let Aura take care of the little things.</p>
+        </div>
+        <span className="scene-badge">AT HOME WITH AURA</span>
+      </section>
+      <aside
+        id="lights"
+        aria-label="Devices"
+        className="devices"
+        data-busy={devicesBusy || controlBusy !== null}
+        data-read-only={readOnly}
+      >
         <div className="device-heading">
           <h2>Lights</h2>
           <button
+            className="action-secondary"
             type="button"
             onClick={() => void refreshDevices()}
             disabled={devicesBusy}
@@ -255,10 +302,15 @@ function App() {
             {deviceError}
           </p>
         )}
-        <ul>
+        <ul className="device-list">
           {devices.map((device) => (
-            <li key={device.id}>
-              <strong>{device.name}</strong>: {device.state}
+            <li
+              key={device.id}
+              data-state={device.state}
+              data-busy={controlBusy === device.id}
+            >
+              <strong>{device.name}</strong>:{' '}
+              <span className="device-state">{device.state}</span>
               {device.canControl && (
                 <div className="light-controls">
                   {(['on', 'off'] as const).map((state) => (
@@ -290,12 +342,16 @@ function App() {
             </li>
           ))}
         </ul>
-        {controlStatus && <p role="status">{controlStatus}</p>}
+        {controlStatus && (
+          <p className="panel-notice" role="status">
+            {controlStatus}
+          </p>
+        )}
         {audit.length > 0 && (
-          <div aria-label="Last control audit">
+          <div className="control-audit" aria-label="Last control audit">
             <h3>Last control</h3>
             {audit.map((entry, index) => (
-              <p key={index}>
+              <p key={index} data-outcome={entry.status}>
                 {entry.deviceId} → {entry.state}: {entry.status}
               </p>
             ))}
@@ -303,77 +359,104 @@ function App() {
         )}
       </aside>
       <section
-        ref={conversationView}
-        className="conversation"
-        aria-label="Conversation"
-        aria-live="polite"
+        className="dashboard-chat"
+        id="conversation"
+        aria-label="Chat with Aura"
       >
-        {lines.length === 0 && (
-          <div className="welcome">
-            <h2>Start with a light.</h2>
-            <p>
-              {deviceBackend === 'home-assistant'
-                ? 'Try “list devices” or “status”.'
-                : 'Try “list devices” or “turn on living room”.'}
-            </p>
-            <p>
-              {deviceBackend === 'home-assistant'
-                ? 'Only configured Home Assistant lights are visible. Granted lights have direct controls.'
-                : 'Living room and bedroom are available as mock lights.'}
-            </p>
-          </div>
-        )}
-        {lines.map((line, index) => (
-          <article key={index} className={line.role}>
-            <strong>{line.role === 'user' ? 'You' : 'Aura'}</strong>
-            <p>{line.content}</p>
-          </article>
-        ))}
-        {busy && <p role="status">Aura is responding…</p>}
-      </section>
-      <form ref={composerView} onSubmit={submit}>
-        <label htmlFor="message">Message Aura</label>
-        <div className="composer">
-          <input
-            id="message"
-            value={message}
-            onChange={(event) => setMessage(event.target.value)}
-            maxLength={4000}
-            placeholder={
-              deviceBackend === 'home-assistant'
-                ? 'List devices'
-                : 'Turn on living room'
-            }
-            disabled={busy || voiceBusy}
-          />
-          <button
-            disabled={
-              busy || voiceBusy || !message.trim() || status !== 'Connected'
-            }
-          >
-            Send
-          </button>
+        <div className="chat-heading">
+          <span className="eyebrow">YOUR HOME ASSISTANT</span>
+          <h2>A little help from Aura.</h2>
         </div>
-      </form>
-      {error && (
-        <p role="alert" className="error">
-          {error}
-        </p>
-      )}
-      <PreferencesPanel />
-      <AutomationsPanel />
-      <VoicePanel
-        disabled={busy || voiceBusy}
-        conversationId={() => conversationId.current}
-        onConversation={(id) => {
-          conversationId.current = id;
-        }}
-        onLine={(role, content) =>
-          setLines((current) => [...current, { role, content }])
-        }
-        onBusy={setVoiceBusy}
-        onComplete={() => void refreshDevices()}
-      />
+        <section
+          ref={conversationView}
+          className="conversation"
+          aria-label="Conversation"
+          aria-live="polite"
+        >
+          {lines.length === 0 && (
+            <div className="welcome">
+              <h2>Start with a light.</h2>
+              <p>
+                {deviceBackend === 'home-assistant'
+                  ? 'Try “list devices” or “status”.'
+                  : 'Try “list devices” or “turn on living room”.'}
+              </p>
+              <p>
+                {deviceBackend === 'home-assistant'
+                  ? 'Only configured Home Assistant lights are visible. Granted lights have direct controls.'
+                  : 'Living room and bedroom are available as mock lights.'}
+              </p>
+            </div>
+          )}
+          {lines.map((line, index) => (
+            <article key={index} className={line.role}>
+              <strong>{line.role === 'user' ? 'You' : 'Aura'}</strong>
+              <p>{line.content}</p>
+            </article>
+          ))}
+          {busy && (
+            <p className="chat-progress" role="status">
+              Aura is responding…
+            </p>
+          )}
+        </section>
+        <form
+          className="chat-form"
+          data-busy={busy || voiceBusy}
+          ref={composerView}
+          onSubmit={submit}
+        >
+          <label htmlFor="message">Message Aura</label>
+          <div className="composer">
+            <input
+              id="message"
+              value={message}
+              onChange={(event) => setMessage(event.target.value)}
+              maxLength={4000}
+              placeholder={
+                deviceBackend === 'home-assistant'
+                  ? 'List devices'
+                  : 'Turn on living room'
+              }
+              disabled={busy || voiceBusy}
+            />
+            <button
+              disabled={
+                busy || voiceBusy || !message.trim() || status !== 'Connected'
+              }
+            >
+              Send
+            </button>
+          </div>
+        </form>
+        {error && (
+          <p role="alert" className="error chat-error">
+            {error}
+          </p>
+        )}
+      </section>
+      <div className="dashboard-voice" id="voice">
+        <VoicePanel
+          disabled={busy || voiceBusy}
+          conversationId={() => conversationId.current}
+          onConversation={(id) => {
+            conversationId.current = id;
+          }}
+          onLine={(role, content) =>
+            setLines((current) => [...current, { role, content }])
+          }
+          onBusy={setVoiceBusy}
+          onComplete={() => void refreshDevices()}
+        />
+      </div>
+      <section
+        className="dashboard-settings"
+        id="settings"
+        aria-label="Home settings"
+      >
+        <PreferencesPanel />
+        <AutomationsPanel />
+      </section>
     </main>
   );
 }

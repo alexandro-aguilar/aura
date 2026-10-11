@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Aura Frontend Design'
+  short_description: 'Style Aura with its existing CSS design system'
+  default_prompt: 'Use $aura-frontend-design to style the requested Aura frontend change with the existing tokens and materials.'
